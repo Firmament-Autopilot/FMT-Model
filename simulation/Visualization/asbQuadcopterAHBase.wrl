@@ -1,0 +1,65 @@
+#VRML V2.0 utf8
+# Copyright 2015 The MathWorks, Inc.
+
+DEF GroundMap Shape {
+  appearance Appearance {
+    texture ImageTexture {
+      url "MWAerial.png" 
+    }
+    material Material {
+    }
+  }
+  geometry Box {
+    size 124.968 0.1 101.346
+  }
+}
+DEF AH3 Transform {
+  translation 33.3 0 -5
+  scale 0.49 1 0.49
+  rotation 0 1 0 0.1379
+  children Inline {
+    url "asbQuadcopterAH3.wrl" 
+  }
+}
+DEF AH1-4 Transform {
+  translation -43 0 39
+  scale 0.97 1 0.97
+  rotation 0 1 0 1.7087
+  children Inline {
+    url "asbQuadcopterAH1-4.wrl" 
+  }
+}
+DEF Light DirectionalLight {
+  direction 0 -1 0
+}
+DEF Background Transform {
+  children [
+    Background {
+      skyColor [
+        0.76238 0.8 0.1427,
+        0.277798 0.219779 0.7,
+        0.222549 0.390234 0.7,
+        0.60094 0.662637 0.69 
+      ]
+      skyAngle [0.1, 1.2, 1.57]
+      groundColor [
+        0 0.8 0,
+        0.174249 0.82 0.187362,
+        0.467223 0.82 0.445801,
+        0.621997 0.67 0.600279 
+      ]
+      groundAngle [0.9, 1.5, 1.57]
+    }
+    DEF Floor Shape {
+      appearance Appearance {
+        material Material {
+          transparency 0.8
+          diffuseColor 0 0.8 0.2
+        }
+      }
+      geometry Box {
+        size 3000 0 3000
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+RTW.TargetRegistry.getInstance('reset');

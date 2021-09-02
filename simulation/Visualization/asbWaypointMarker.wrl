@@ -1,0 +1,23 @@
+#VRML V2.0 utf8
+
+# Copyright 2017 The MathWorks, Inc.
+PROTO MarkerProto [
+  exposedField SFVec3f Translation 0 0 0
+]
+{
+  Transform {
+    translation IS Translation
+    scale 0.5 0.5 0.5
+    rotation 0.6786 -0.6786 -0.2811 1.096
+    children Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 1 1 0
+        }
+      }
+      geometry Box {
+        size 0.2 0.2 0.2
+      }
+    }
+  }
+}
