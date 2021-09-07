@@ -1,14 +1,14 @@
 % Firmament Autopilot
-% BLog (Binary Log) Parser
-% @brief: parse blog.bin file
-function [LogHeader, LogMsg] = blog_parser(logfile)
+% MLog (Mat Log) Parser
+% @brief: parse mlog.bin file
+function [LogHeader, LogMsg] = mlog_parser(logfile)
 
 %% BLog Data Type Definition
-BLOG_TYPE = ["int8=>int8", "uint8=>uint8", "int16=>int16", "uint16=>uint16",...
+MLOG_TYPE = ["int8=>int8", "uint8=>uint8", "int16=>int16", "uint16=>uint16",...
     "int32=>int32", "uint32=>uint32", "float=>float", "double=>double"];
-BLOG_BEGIN_MSG1 = hex2dec('92');
-BLOG_BEGIN_MSG2 = hex2dec('05');
-BLOG_END_MSG = hex2dec('26');
+MLOG_BEGIN_MSG1 = hex2dec('92');
+MLOG_BEGIN_MSG2 = hex2dec('05');
+MLOG_END_MSG = hex2dec('26');
 
 %% Open Log File
 fileID = fopen(logfile, 'r');
@@ -28,7 +28,7 @@ LogHeader.max_model_info_len = fread(fileID, 1, 'uint16=>uint16');
 LogHeader.description = fread(fileID, LogHeader.max_desc_len, 'char=>char');
 LogHeader.model_info = fread(fileID, LogHeader.max_model_info_len, 'char=>char');
 
-fprintf('Blog File:%s\n', logfile);
+fprintf('MLog File:%s\n', logfile);
 fprintf('Version:%d\n', LogHeader.version);
 fprintf('Timestamp:%d(ms)\n', LogHeader.timestamp);
 fprintf('Description:%s\n', LogHeader.description);
@@ -74,7 +74,7 @@ for n = 1:LogHeader.num_param_group
         LogHeader.param_group_list(n).param(k).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
         LogHeader.param_group_list(n).param(k).type = fread(fileID, 1, 'uint8=>uint8');
         index = LogHeader.param_group_list(n).param(k).type+1;
-        LogHeader.param_group_list(n).param(k).val = fread(fileID, 1, BLOG_TYPE(index));
+        LogHeader.param_group_list(n).param(k).val = fread(fileID, 1, MLOG_TYPE(index));
         LogHeader.param_group_list(n).param(k).name = LogHeader.param_group_list(n).param(k).name(~isspace(LogHeader.param_group_list(n).param(k).name));
     end
 end
@@ -87,17 +87,17 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     while begin_state < 2
         switch begin_state
             case 0
-                % search for BLOG_BEGIN_MSG1
+                % search for MLOG_BEGIN_MSG1
                 msg_begin = fread(fileID, 1, 'uint8=>uint8');
-                if msg_begin == BLOG_BEGIN_MSG1
+                if msg_begin == MLOG_BEGIN_MSG1
                     begin_state = 1;
                 end
             case 1
-                % search for BLOG_BEGIN_MSG2
+                % search for MLOG_BEGIN_MSG2
                 msg_begin = fread(fileID, 1, 'uint8=>uint8');
-                if msg_begin == BLOG_BEGIN_MSG2
+                if msg_begin == MLOG_BEGIN_MSG2
                     begin_state = 2;
-                elseif msg_begin == BLOG_BEGIN_MSG1
+                elseif msg_begin == MLOG_BEGIN_MSG1
                     begin_state = 1;
                 else
                     begin_state = 0;
@@ -138,7 +138,7 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
         type = LogHeader.bus(index).elem_list(k).type+1;
         len = LogHeader.bus(index).elem_list(k).number;
         
-        [elem_val, rb] = fread(fileID, [len, 1], BLOG_TYPE(type));
+        [elem_val, rb] = fread(fileID, [len, 1], MLOG_TYPE(type));
         
         if rb < len
             fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount{msg_id});
@@ -152,7 +152,7 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     
     %%% Read Msg End Flag %%%
     msg_end = fread(fileID, 1, 'uint8=>uint8');
-    if msg_end == BLOG_END_MSG
+    if msg_end == MLOG_END_MSG
         % valid msg received
         MsgCount{msg_id} = MsgCount{msg_id} + 1;
     else
