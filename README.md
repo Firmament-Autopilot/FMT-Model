@@ -1,4 +1,4 @@
-<p align="center"><img width="160" src="https://github.com/Firmament-Autopilot/FMT_Firmware/blob/master/figures/logo.png" alt=FMT logo"></p>
+<p align="center"><img width="160" src="figures/logo.png" alt=FMT logo"></p>
 
 <p align="center">
   <a href="/LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-green" alt="GitHub license" /></a>
