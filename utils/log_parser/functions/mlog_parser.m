@@ -37,7 +37,6 @@ fprintf('Model Information:\n%s\n', LogHeader.model_info);
 % Read Bus
 LogHeader.num_bus = fread(fileID, 1, 'uint8=>uint8');
 
-bus_alligned = 1; % bus_alligned=1 ==> msg_id=bus_index
 for n = 1:LogHeader.num_bus
     LogHeader.bus(n).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
     LogHeader.bus(n).msg_id = fread(fileID, 1, 'uint8=>uint8');
@@ -53,13 +52,8 @@ for n = 1:LogHeader.num_bus
     
     % init msg count and msg buffer
     % TODO: Can be faster if pre-allocate the memory or not use cell array
-    MsgCount{LogHeader.bus(n).msg_id} = 0;
-    LogMsg{LogHeader.bus(n).msg_id} = {};
-    
-    % check if msg id is alligned with bus index 
-    if LogHeader.bus(n).msg_id ~= n
-        bus_alligned = 0;
-    end
+    MsgCount{n} = 0;
+    LogMsg{n} = {};
 end
 
 % Read Parameter
@@ -110,20 +104,10 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     %%% Read Msg ID %%%
     msg_id = fread(fileID, 1, 'uint8=>uint8');
     
-    if bus_alligned
-        index = msg_id;
-        if index > LogHeader.num_bus
-            index = -1; % invalid msg id
-        end
-    else
-        % search bus index
-        index = -1;
-        for n = 1 : LogHeader.num_bus
-            if msg_id == LogHeader.bus(n).msg_id
-                index = n;
-                break;
-            end
-        end       
+    % msg_id start from 0 and index start from 1
+    index = msg_id + 1;
+    if index > LogHeader.num_bus
+        index = -1; % invalid msg id
     end
 
     if index < 0
@@ -141,12 +125,12 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
         [elem_val, rb] = fread(fileID, [len, 1], MLOG_TYPE(type));
         
         if rb < len
-            fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount{msg_id});
+            fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount{index});
             % TODO: handle this error
             break;
         else
             % LogMsg{msg_id}{elem_index}(len:cnt)
-            LogMsg{msg_id}{k}(1:len, MsgCount{msg_id}+1) = elem_val;
+            LogMsg{index}{k}(1:len, MsgCount{index}+1) = elem_val;
         end
     end
     
@@ -154,13 +138,13 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     msg_end = fread(fileID, 1, 'uint8=>uint8');
     if msg_end == MLOG_END_MSG
         % valid msg received
-        MsgCount{msg_id} = MsgCount{msg_id} + 1;
+        MsgCount{index} = MsgCount{index} + 1;
     else
         fprintf('invalid msg end flag:%d, msg id:%d\r\n', msg_end, msg_id);
         % delete invalid msg
         for k = 1:LogHeader.bus(index).num_elem
             try
-                LogMsg{msg_id}{k}(:, MsgCount{msg_id}+1) = [];
+                LogMsg{index}{k}(:, MsgCount{index}+1) = [];
             catch
                 continue
             end
@@ -175,7 +159,7 @@ fprintf('\nLog parse finish!\n');
 for n = 1:LogHeader.num_bus
     BusName = strrep(LogHeader.bus(n).name, '"', '');
     BusName = BusName(~isspace(BusName));
-	fprintf('%s: %d msg recorded\n', BusName, MsgCount{LogHeader.bus(n).msg_id});
+	fprintf('%s: %d msg recorded\n', BusName, MsgCount{n});
 end
 
 %% Generate .MAT file
@@ -188,7 +172,8 @@ save(strcat(Path, '/LogHeader.mat'), 'LogHeader'); % save log header
 
 for n = 1:LogHeader.num_bus
     msg_id = LogHeader.bus(n).msg_id;
-    if isempty(LogMsg{msg_id})
+    index = msg_id + 1;
+    if isempty(LogMsg{index})
        continue; 
     end
     
@@ -209,7 +194,7 @@ for n = 1:LogHeader.num_bus
        fprintf("can't find timestamp element in %s\n", LogHeader.bus(n).name);
        continue;
     else
-       time_stamp = double(LogMsg{msg_id}{timestamp_id}-LogMsg{msg_id}{timestamp_id}(1)) * 0.001;   % milli second to second
+       time_stamp = double(LogMsg{index}{timestamp_id}-LogMsg{index}{timestamp_id}(1)) * 0.001;   % milli second to second
     end
     
     % construct Bus variable
@@ -217,7 +202,7 @@ for n = 1:LogHeader.num_bus
         ElemName = strrep(LogHeader.bus(n).elem_list(k).name, '"', '');
         ElemName = ElemName(~isspace(ElemName));
         
-        exp = sprintf('timeseries(LogMsg{msg_id}{k}'', time_stamp);');
+        exp = sprintf('timeseries(LogMsg{index}{k}'', time_stamp);');
         if ~isempty(ElemName)
             eval([BusName, '.', ElemName, '=', exp]);
         else
