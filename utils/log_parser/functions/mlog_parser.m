@@ -6,6 +6,8 @@ function [LogHeader, LogMsg] = mlog_parser(logfile)
 %% BLog Data Type Definition
 MLOG_TYPE = ["int8=>int8", "uint8=>uint8", "int16=>int16", "uint16=>uint16",...
     "int32=>int32", "uint32=>uint32", "float=>float", "double=>double"];
+
+% mlog message start/end flag
 MLOG_BEGIN_MSG1 = hex2dec('92');
 MLOG_BEGIN_MSG2 = hex2dec('05');
 MLOG_END_MSG = hex2dec('26');
@@ -36,12 +38,11 @@ fprintf('Model Information:\n%s\n', LogHeader.model_info);
 
 % Read Bus
 LogHeader.num_bus = fread(fileID, 1, 'uint8=>uint8');
-
 for n = 1:LogHeader.num_bus
     LogHeader.bus(n).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
     LogHeader.bus(n).msg_id = fread(fileID, 1, 'uint8=>uint8');
     LogHeader.bus(n).num_elem = fread(fileID, 1, 'uint8=>uint8');
-
+    % Read bus elements
     for k = 1:LogHeader.bus(n).num_elem
         LogHeader.bus(n).elem_list(k).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
         LogHeader.bus(n).elem_list(k).type = fread(fileID, 1, 'uint16=>uint16');
@@ -52,9 +53,12 @@ for n = 1:LogHeader.num_bus
     
     % init msg count and msg buffer
     % TODO: Can be faster if pre-allocate the memory or not use cell array
-    MsgCount{n} = 0;
+    %MsgCount{n} = 0;
     LogMsg{n} = {};
 end
+
+% 
+MsgCount = zeros(1, LogHeader.num_bus);
 
 % Read Parameter
 LogHeader.num_param_group = fread(fileID, 1, 'uint8=>uint8');
@@ -125,12 +129,12 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
         [elem_val, rb] = fread(fileID, [len, 1], MLOG_TYPE(type));
         
         if rb < len
-            fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount{index});
+            fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount(index));
             % TODO: handle this error
             break;
         else
             % LogMsg{msg_id}{elem_index}(len:cnt)
-            LogMsg{index}{k}(1:len, MsgCount{index}+1) = elem_val;
+            LogMsg{index}{k}(1:len, MsgCount(index)+1) = elem_val;
         end
     end
     
@@ -138,13 +142,13 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     msg_end = fread(fileID, 1, 'uint8=>uint8');
     if msg_end == MLOG_END_MSG
         % valid msg received
-        MsgCount{index} = MsgCount{index} + 1;
+        MsgCount(index) = MsgCount(index) + 1;
     else
         fprintf('invalid msg end flag:%d, msg id:%d\r\n', msg_end, msg_id);
         % delete invalid msg
         for k = 1:LogHeader.bus(index).num_elem
             try
-                LogMsg{index}{k}(:, MsgCount{index}+1) = [];
+                LogMsg{index}{k}(:, MsgCount(index)+1) = [];
             catch
                 continue
             end
@@ -159,7 +163,7 @@ fprintf('\nLog parse finish!\n');
 for n = 1:LogHeader.num_bus
     BusName = strrep(LogHeader.bus(n).name, '"', '');
     BusName = BusName(~isspace(BusName));
-	fprintf('%s: %d msg recorded\n', BusName, MsgCount{n});
+	fprintf('%s: %d msg recorded\n', BusName, MsgCount(n));
 end
 
 %% Generate .MAT file
