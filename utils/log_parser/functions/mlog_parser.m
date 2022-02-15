@@ -4,7 +4,7 @@
 function [LogHeader, LogMsg] = mlog_parser(logfile)
 
 %% BLog Data Type Definition
-MLOG_TYPE = ["int8=>int8", "uint8=>uint8", "int16=>int16", "uint16=>uint16",...
+TYPE_CAST = ["int8=>int8", "uint8=>uint8", "int16=>int16", "uint16=>uint16",...
     "int32=>int32", "uint32=>uint32", "float=>float", "double=>double"];
 
 % mlog message start/end flag
@@ -36,8 +36,12 @@ fprintf('Timestamp:%d(ms)\n', LogHeader.timestamp);
 fprintf('Description:%s\n', LogHeader.description);
 fprintf('Model Information:\n%s\n', LogHeader.model_info);
 
-% Read Bus
+% Read bus number
 LogHeader.num_bus = fread(fileID, 1, 'uint8=>uint8');
+% Preallocate memory
+MsgCount = zeros(1, LogHeader.num_bus);
+LogMsg = cell(1, LogHeader.num_bus);
+% Read bus data
 for n = 1:LogHeader.num_bus
     LogHeader.bus(n).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
     LogHeader.bus(n).msg_id = fread(fileID, 1, 'uint8=>uint8');
@@ -47,18 +51,10 @@ for n = 1:LogHeader.num_bus
         LogHeader.bus(n).elem_list(k).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
         LogHeader.bus(n).elem_list(k).type = fread(fileID, 1, 'uint16=>uint16');
         LogHeader.bus(n).elem_list(k).number = fread(fileID, 1, 'uint16=>uint16');
-        
-%         LogMsg{LogHeader.bus(n).msg_id}{k}(1:LogHeader.bus(n).elem_list(k).number, 1:1000) = 0;
     end
-    
-    % init msg count and msg buffer
-    % TODO: Can be faster if pre-allocate the memory or not use cell array
-    %MsgCount{n} = 0;
-    LogMsg{n} = {};
+    % Preallocate memory
+    LogMsg{n} = cell(1, LogHeader.bus(n).num_elem);
 end
-
-% 
-MsgCount = zeros(1, LogHeader.num_bus);
 
 % Read Parameter
 LogHeader.num_param_group = fread(fileID, 1, 'uint8=>uint8');
@@ -72,7 +68,7 @@ for n = 1:LogHeader.num_param_group
         LogHeader.param_group_list(n).param(k).name = fread(fileID, [1 LogHeader.max_name_len], 'uint8=>char');
         LogHeader.param_group_list(n).param(k).type = fread(fileID, 1, 'uint8=>uint8');
         index = LogHeader.param_group_list(n).param(k).type+1;
-        LogHeader.param_group_list(n).param(k).val = fread(fileID, 1, MLOG_TYPE(index));
+        LogHeader.param_group_list(n).param(k).val = fread(fileID, 1, TYPE_CAST(index));
         LogHeader.param_group_list(n).param(k).name = LogHeader.param_group_list(n).param(k).name(~isspace(LogHeader.param_group_list(n).param(k).name));
     end
 end
@@ -121,12 +117,13 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     end
 
     %%% Read Msg Payload %%%
+    
     % read bus elements
     for k = 1:LogHeader.bus(index).num_elem
         type = LogHeader.bus(index).elem_list(k).type+1;
         len = LogHeader.bus(index).elem_list(k).number;
         
-        [elem_val, rb] = fread(fileID, [len, 1], MLOG_TYPE(type));
+        [elem_val, rb] = fread(fileID, [len, 1], TYPE_CAST(type));
         
         if rb < len
             fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount(index));

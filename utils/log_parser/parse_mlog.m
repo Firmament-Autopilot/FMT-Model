@@ -9,7 +9,9 @@ end
 
 logfile = strcat(folder, file);
 
+tic
 [header, log_msg] = mlog_parser(logfile);
+toc
 
 clear file;
 clear folder;
