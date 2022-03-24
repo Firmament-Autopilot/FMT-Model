@@ -43,6 +43,9 @@ FMS_PARAM.Value.VEL_Z_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'VE
 FMS_PARAM.Value.YAW_P = get_param_val(LogHeader.param_group_list, 'FMS', 'YAW_P');
 FMS_PARAM.Value.YAW_RATE_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'YAW_RATE_LIM');
 FMS_PARAM.Value.ROLL_PITCH_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'ROLL_PITCH_LIM');
+FMS_PARAM.Value.L1 = get_param_val(LogHeader.param_group_list, 'FMS', 'L1');
+FMS_PARAM.Value.CRUISE_SPEED = get_param_val(LogHeader.param_group_list, 'FMS', 'CRUISE_SPEED');
+FMS_PARAM.Value.TAKEOFF_H = get_param_val(LogHeader.param_group_list, 'FMS', 'TAKEOFF_H');
 
 %% load controller parameters
 CONTROL_PARAM.Value.VEL_XY_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_P');
