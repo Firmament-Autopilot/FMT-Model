@@ -7,19 +7,55 @@
 # Overview
 Firmament Model (FMT Model) is a part of [Firmament Autopilot](https://github.com/Firmament-Autopilot) project. It includes a simulation framework with algorithm libraries designed with MATLAB/Simulink.
 
-> FMT Model is mainly developed and tested in **Matlab 2018b**, so it's strongly recommended to use this version. However, it's possible to open the project with higher matlab version, but that is not well tested.
-
 ## Architecture
 <p align="center"><img width="700" src="figures/fmt_model.png" alt=structure"></p>
 
-## Document
-[User Guide](https://firmament-autopilot.github.io/FMT-DOCS/#/)
+## Environmet
+FMT-Model is developed in MATLAB 2018b, which is the recommend version. However, you should be able to use higher MATLAB version as well.
+
+## Required Toolbox
+- Aerospace Blockset (4.0)
+- Embedded Coder (7.1)
+- Instrument Control Toolbox (3.14)
+- MATLAB (9.5)
+- Simulink (9.2)
+- Simulink 3D Animation (8.1)
+- Simulink Coder (9.0)
+
+## Quick Start
+To get the FMT-Model, use the following command. This will clone the code base of FMT-Model with all submodules (INS, FMS, Controller, Plant).
+
+```
+git clone https://github.com/Firmament-Autopilot/FMT-Model.git --recursive
+```
+
+Then open MATLAB and change the work directory to FMT-Model root folder. After that, run the`FMT_Model.prj`, which will do all the initialization for you.
+
+## Code Catalogue
+FMT-Model source code catalog is shown as follow:
+
+| Name       | Description                               |
+| ---------- | ----------------------------------------- |
+| bus        | Scripts to generate simulink bus objects. |
+| figures    | Project figures.                          |
+| lib        | FMT-Model toolbox model library.          |
+| model      | Simulink model source file.               |
+| script     | Matlab scripts.                           |
+| simulation | Simulation related simulink model.        |
+| utils      | Project utils.                            |
 
 ## Simulation
 
-Please refer to the document for simulation.
+Current supported simulation:
+- MIL (Model-in-the-loop Simulation) 
+- Open-loop Simulation
+
+For more information, please refer to the document.
 
 <p float="left">
   <img src="figures/matlab_3D.png" width="400" />
   <img src="figures/flightgear.png" width="400" />
 </p>
+
+## Document
+[User Guide](https://firmament-autopilot.github.io/FMT-DOCS/#/)
