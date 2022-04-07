@@ -22,6 +22,8 @@ FMT-Model is developed in MATLAB 2018b, which is the recommend version. However,
 - Simulink 3D Animation (8.1)
 - Simulink Coder (9.0)
 
+For other toolboxes required by the submodules, please check the *README.md* inside the model.
+
 ## Quick Start
 To get the FMT-Model, use the following command. This will clone the code base of FMT-Model with all submodules (INS, FMS, Controller, Plant).
 
