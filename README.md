@@ -22,7 +22,10 @@ FMT-Model is developed in MATLAB 2018b, which is the recommend version. However,
 - Simulink 3D Animation (8.1)
 - Simulink Coder (9.0)
 
-For other toolboxes required by the submodules, please check the *README.md* inside the model.
+For other toolboxes required by the model, please check the *README.md* inside the submodules.
+
+## Document
+[User Guide](https://firmament-autopilot.github.io/FMT-DOCS/#/)
 
 ## Quick Start
 To get the FMT-Model, use the following command. This will clone the code base of FMT-Model with all submodules (INS, FMS, Controller, Plant).
@@ -58,6 +61,3 @@ For more information, please refer to the document.
   <img src="figures/matlab_3D.png" width="400" />
   <img src="figures/flightgear.png" width="400" />
 </p>
-
-## Document
-[User Guide](https://firmament-autopilot.github.io/FMT-DOCS/#/)
