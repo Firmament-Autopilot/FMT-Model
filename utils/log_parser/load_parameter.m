@@ -34,6 +34,7 @@ FMS_PARAM.Value.ROLL_PITCH_LIM = get_param_val(LogHeader.param_group_list, 'FMS'
 FMS_PARAM.Value.L1 = get_param_val(LogHeader.param_group_list, 'FMS', 'L1');
 FMS_PARAM.Value.CRUISE_SPEED = get_param_val(LogHeader.param_group_list, 'FMS', 'CRUISE_SPEED');
 FMS_PARAM.Value.TAKEOFF_H = get_param_val(LogHeader.param_group_list, 'FMS', 'TAKEOFF_H');
+FMS_PARAM.Value.ACCEPT_R = get_param_val(LogHeader.param_group_list, 'FMS', 'ACCEPT_R');
 
 %% load controller parameters
 CONTROL_PARAM.Value.VEL_XY_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_P');
