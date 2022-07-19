@@ -10,6 +10,7 @@ INS_PARAM.Value.HEADING_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 
 INS_PARAM.Value.MAG_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'MAG_GAIN');
 INS_PARAM.Value.BIAS_G_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BIAS_G_GAIN');
 INS_PARAM.Value.GPS_POS_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_POS_GAIN');
+INS_PARAM.Value.GPS_ALT_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_ALT_GAIN');
 INS_PARAM.Value.GPS_VEL_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VEL_GAIN');
 INS_PARAM.Value.GPS_BIAS_A_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_BIAS_A_GAIN');
 INS_PARAM.Value.GPS_POS_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_POS_DELAY');
