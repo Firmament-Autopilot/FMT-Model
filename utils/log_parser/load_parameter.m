@@ -15,10 +15,17 @@ INS_PARAM.Value.GPS_VEL_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 
 INS_PARAM.Value.GPS_BIAS_A_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_BIAS_A_GAIN');
 INS_PARAM.Value.GPS_POS_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_POS_DELAY');
 INS_PARAM.Value.GPS_VEL_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VEL_DELAY');
+INS_PARAM.Value.OPF_VEL_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'OPF_VEL_GAIN');
+INS_PARAM.Value.OPF_BIAS_A_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'OPF_BIAS_A_GAIN');
+INS_PARAM.Value.OPF_VEL_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'OPF_VEL_DELAY');
 INS_PARAM.Value.BARO_H_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_H_GAIN');
 INS_PARAM.Value.BARO_VZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_VZ_GAIN');
 INS_PARAM.Value.BARO_BIAS_AZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_BIAS_AZ_GAIN');
 INS_PARAM.Value.BARO_H_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_H_DELAY');
+INS_PARAM.Value.RF_H_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'RF_H_GAIN');
+INS_PARAM.Value.RF_VZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'RF_VZ_GAIN');
+INS_PARAM.Value.RF_BIAS_AZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'RF_BIAS_AZ_GAIN');
+INS_PARAM.Value.RF_H_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'RF_H_DELAY');
 
 %% load fms parameters
 FMS_PARAM.Value.THROTTLE_DZ = get_param_val(LogHeader.param_group_list, 'FMS', 'THROTTLE_DZ');
