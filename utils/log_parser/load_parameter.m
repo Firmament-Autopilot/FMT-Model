@@ -1,79 +1,37 @@
-%% load ins parameters
-INS_PARAM.Value.GPS_HOR_Q_BIAS = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_HOR_Q_BIAS');
-INS_PARAM.Value.GPS_HOR_Q_SCALE = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_HOR_Q_SCALE');
-INS_PARAM.Value.GPS_VER_Q_BIAS = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VER_Q_BIAS');
-INS_PARAM.Value.GPS_VER_Q_SCALE = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VER_Q_SCALE');
-INS_PARAM.Value.GPS_VEL_Q_BIAS = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VEL_Q_BIAS');
-INS_PARAM.Value.GPS_VEL_Q_SCALE = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VEL_Q_SCALE');
-INS_PARAM.Value.ATT_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'ATT_GAIN');
-INS_PARAM.Value.HEADING_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'HEADING_GAIN');
-INS_PARAM.Value.MAG_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'MAG_GAIN');
-INS_PARAM.Value.BIAS_G_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BIAS_G_GAIN');
-INS_PARAM.Value.GPS_POS_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_POS_GAIN');
-INS_PARAM.Value.GPS_ALT_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_ALT_GAIN');
-INS_PARAM.Value.GPS_VEL_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VEL_GAIN');
-INS_PARAM.Value.GPS_BIAS_A_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_BIAS_A_GAIN');
-INS_PARAM.Value.GPS_POS_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_POS_DELAY');
-INS_PARAM.Value.GPS_VEL_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'GPS_VEL_DELAY');
-INS_PARAM.Value.OPF_VEL_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'OPF_VEL_GAIN');
-INS_PARAM.Value.OPF_BIAS_A_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'OPF_BIAS_A_GAIN');
-INS_PARAM.Value.OPF_VEL_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'OPF_VEL_DELAY');
-INS_PARAM.Value.BARO_H_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_H_GAIN');
-INS_PARAM.Value.BARO_VZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_VZ_GAIN');
-INS_PARAM.Value.BARO_BIAS_AZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_BIAS_AZ_GAIN');
-INS_PARAM.Value.BARO_H_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'BARO_H_DELAY');
-INS_PARAM.Value.RF_H_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'RF_H_GAIN');
-INS_PARAM.Value.RF_VZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'RF_VZ_GAIN');
-INS_PARAM.Value.RF_BIAS_AZ_GAIN = get_param_val(LogHeader.param_group_list, 'INS', 'RF_BIAS_AZ_GAIN');
-INS_PARAM.Value.RF_H_DELAY = get_param_val(LogHeader.param_group_list, 'INS', 'RF_H_DELAY');
+%% Load model parameters from log header
 
-%% load fms parameters
-FMS_PARAM.Value.THROTTLE_DZ = get_param_val(LogHeader.param_group_list, 'FMS', 'THROTTLE_DZ');
-FMS_PARAM.Value.YAW_DZ = get_param_val(LogHeader.param_group_list, 'FMS', 'YAW_DZ');
-FMS_PARAM.Value.ROLL_DZ = get_param_val(LogHeader.param_group_list, 'FMS', 'ROLL_DZ');
-FMS_PARAM.Value.PITCH_DZ = get_param_val(LogHeader.param_group_list, 'FMS', 'PITCH_DZ');
-FMS_PARAM.Value.XY_P = get_param_val(LogHeader.param_group_list, 'FMS', 'XY_P');
-FMS_PARAM.Value.Z_P = get_param_val(LogHeader.param_group_list, 'FMS', 'Z_P');
-FMS_PARAM.Value.VEL_XY_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'VEL_XY_LIM');
-FMS_PARAM.Value.VEL_Z_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'VEL_Z_LIM');
-FMS_PARAM.Value.YAW_P = get_param_val(LogHeader.param_group_list, 'FMS', 'YAW_P');
-FMS_PARAM.Value.YAW_RATE_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'YAW_RATE_LIM');
-FMS_PARAM.Value.ROLL_PITCH_LIM = get_param_val(LogHeader.param_group_list, 'FMS', 'ROLL_PITCH_LIM');
-FMS_PARAM.Value.L1 = get_param_val(LogHeader.param_group_list, 'FMS', 'L1');
-FMS_PARAM.Value.CRUISE_SPEED = get_param_val(LogHeader.param_group_list, 'FMS', 'CRUISE_SPEED');
-FMS_PARAM.Value.TAKEOFF_H = get_param_val(LogHeader.param_group_list, 'FMS', 'TAKEOFF_H');
-FMS_PARAM.Value.ACCEPT_R = get_param_val(LogHeader.param_group_list, 'FMS', 'ACCEPT_R');
+% Load INS parameters
+fieldname = fieldnames(INS_PARAM.Value);
+[row, ~] = size(fieldname);
+for k = 1:row
+    val = get_param_val(LogHeader.param_group_list, 'INS', fieldname{k});
+    if isnan(val)
+        fprintf("Can't find INS pararameter %s\n", fieldname{k});
+    else
+        INS_PARAM.Value.(fieldname{k}) = val;
+    end
+end
 
-%% load controller parameters
-CONTROL_PARAM.Value.VEL_XY_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_P');
-CONTROL_PARAM.Value.VEL_XY_I = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_I');
-CONTROL_PARAM.Value.VEL_XY_D = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_D');
-CONTROL_PARAM.Value.VEL_Z_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_P');
-CONTROL_PARAM.Value.VEL_Z_I = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_I');
-CONTROL_PARAM.Value.VEL_Z_D = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_D');
-CONTROL_PARAM.Value.VEL_XY_I_MIN = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_I_MIN');
-CONTROL_PARAM.Value.VEL_XY_I_MAX = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_I_MAX');
-CONTROL_PARAM.Value.VEL_XY_D_MIN = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_D_MIN');
-CONTROL_PARAM.Value.VEL_XY_D_MAX = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_XY_D_MAX');
-CONTROL_PARAM.Value.VEL_Z_I_MIN = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_I_MIN');
-CONTROL_PARAM.Value.VEL_Z_I_MAX = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_I_MAX');
-CONTROL_PARAM.Value.VEL_Z_D_MIN = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_D_MIN');
-CONTROL_PARAM.Value.VEL_Z_D_MAX = get_param_val(LogHeader.param_group_list, 'CONTROL', 'VEL_Z_D_MAX');
-CONTROL_PARAM.Value.ROLL_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'ROLL_P');
-CONTROL_PARAM.Value.PITCH_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'PITCH_P');
-CONTROL_PARAM.Value.ROLL_PITCH_CMD_LIM = get_param_val(LogHeader.param_group_list, 'CONTROL', 'ROLL_PITCH_CMD_LIM');
-CONTROL_PARAM.Value.ROLL_RATE_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'ROLL_RATE_P');
-CONTROL_PARAM.Value.PITCH_RATE_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'PITCH_RATE_P');
-CONTROL_PARAM.Value.YAW_RATE_P = get_param_val(LogHeader.param_group_list, 'CONTROL', 'YAW_RATE_P');
-CONTROL_PARAM.Value.ROLL_RATE_I = get_param_val(LogHeader.param_group_list, 'CONTROL', 'ROLL_RATE_I');
-CONTROL_PARAM.Value.PITCH_RATE_I = get_param_val(LogHeader.param_group_list, 'CONTROL', 'PITCH_RATE_I');
-CONTROL_PARAM.Value.YAW_RATE_I = get_param_val(LogHeader.param_group_list, 'CONTROL', 'YAW_RATE_I');
-CONTROL_PARAM.Value.ROLL_RATE_D = get_param_val(LogHeader.param_group_list, 'CONTROL', 'ROLL_RATE_D');
-CONTROL_PARAM.Value.PITCH_RATE_D = get_param_val(LogHeader.param_group_list, 'CONTROL', 'PITCH_RATE_D');
-CONTROL_PARAM.Value.YAW_RATE_D = get_param_val(LogHeader.param_group_list, 'CONTROL', 'YAW_RATE_D');
-CONTROL_PARAM.Value.RATE_I_MIN = get_param_val(LogHeader.param_group_list, 'CONTROL', 'RATE_I_MIN');
-CONTROL_PARAM.Value.RATE_I_MAX = get_param_val(LogHeader.param_group_list, 'CONTROL', 'RATE_I_MAX');
-CONTROL_PARAM.Value.RATE_D_MIN = get_param_val(LogHeader.param_group_list, 'CONTROL', 'RATE_D_MIN');
-CONTROL_PARAM.Value.RATE_D_MAX = get_param_val(LogHeader.param_group_list, 'CONTROL', 'RATE_D_MAX');
-CONTROL_PARAM.Value.P_Q_CMD_LIM = get_param_val(LogHeader.param_group_list, 'CONTROL', 'P_Q_CMD_LIM');
-CONTROL_PARAM.Value.R_CMD_LIM = get_param_val(LogHeader.param_group_list, 'CONTROL', 'R_CMD_LIM');
+% Load FMS parameters
+fieldname = fieldnames(FMS_PARAM.Value);
+[row, ~] = size(fieldname);
+for k = 1:row
+    val = get_param_val(LogHeader.param_group_list, 'FMS', fieldname{k});
+    if isnan(val)
+        fprintf("Can't find FMS pararameter %s\n", fieldname{k});
+    else
+        FMS_PARAM.Value.(fieldname{k}) = val;
+    end
+end
+
+% Load CONTROL parameters
+fieldname = fieldnames(CONTROL_PARAM.Value);
+[row, ~] = size(fieldname);
+for k = 1:row
+    val = get_param_val(LogHeader.param_group_list, 'CONTROL', fieldname{k});
+    if isnan(val)
+        fprintf("Can't find CONTROL pararameter %s\n", fieldname{k});
+    else
+        CONTROL_PARAM.Value.(fieldname{k}) = val;
+    end
+end
