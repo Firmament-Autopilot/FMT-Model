@@ -1,4 +1,4 @@
-model_version = 'v0.3.0';
+model_version = 'v0.3.1';
 model_name = 'Base INS';
 
 %% Load configuration
@@ -20,12 +20,12 @@ INS_EXPORT = Simulink.Parameter(INS_EXPORT_VALUE);
 INS_EXPORT.CoderInfo.StorageClass = 'ExportedGlobal';
 
 %% Paramaters
-INS_PARAM_VALUE.GPS_HOR_Q_BIAS = single(3);
+INS_PARAM_VALUE.GPS_HOR_Q_BIAS = single(2.5);
 INS_PARAM_VALUE.GPS_HOR_Q_SCALE = single(0.4);
-INS_PARAM_VALUE.GPS_VER_Q_BIAS = single(6);
+INS_PARAM_VALUE.GPS_VER_Q_BIAS = single(4.5);
 INS_PARAM_VALUE.GPS_VER_Q_SCALE = single(0.25);
-INS_PARAM_VALUE.GPS_VEL_Q_BIAS = single(0.8);
-INS_PARAM_VALUE.GPS_VEL_Q_SCALE = single(2);
+INS_PARAM_VALUE.GPS_VEL_Q_BIAS = single(1);
+INS_PARAM_VALUE.GPS_VEL_Q_SCALE = single(1);
 INS_PARAM_VALUE.ATT_GAIN = single(0.2);
 INS_PARAM_VALUE.HEADING_GAIN = single(0.05);
 INS_PARAM_VALUE.MAG_GAIN = single(0.2);
