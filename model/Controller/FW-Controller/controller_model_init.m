@@ -1,4 +1,4 @@
-model_version = 'v0.0.1';
+model_version = 'v0.0.2';
 model_name = 'FW Controller';
 
 %% load configuration
@@ -37,6 +37,7 @@ CONTROL_PARAM_VALUE.FW_PI_LIMIT = single(1);
 CONTROL_PARAM_VALUE.FW_ROLL_EFFC = single(-1);
 CONTROL_PARAM_VALUE.FW_PITCH_EFFC = single(-1);
 CONTROL_PARAM_VALUE.FW_YAW_EFFC = single(1);
+CONTROL_PARAM_VALUE.FW_PITCH_OFFSET = single(3/180*pi);
 
 CONTROL_PARAM_VALUE.FW_TECS_PITCH_F = single(0.1);
 CONTROL_PARAM_VALUE.FW_TECS_THOR_FF = single(0.1);
