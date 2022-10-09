@@ -7,6 +7,7 @@ classdef ControlMode < Simulink.IntEnumType
         Stabilize(3)
         ALTCTL(4)
         POSCTL(5)
+        Offboard(6)
     end
   
     methods (Static)
