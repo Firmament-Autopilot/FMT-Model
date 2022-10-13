@@ -1,4 +1,4 @@
-model_version = 'v0.3.7';
+model_version = 'v0.4.0';
 model_name = 'Base FMS';
 
 %% load model configuration
