@@ -1,8 +1,8 @@
 % For more details about this multicopter plant model, please refer to:
 % https://pure.tue.nl/ws/portalfiles/portal/110035542/Jiachi_Zou_Thesis.pdf
 
-model_version = 'v0.2.2';
-model_name = 'Multicopter';
+model_version = 'v0.0.1';
+model_name = 'Fixwing';
 
 %% load configuration
 load('plant_default_config.mat');
