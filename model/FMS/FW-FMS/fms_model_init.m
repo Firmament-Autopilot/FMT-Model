@@ -43,8 +43,5 @@ FMS_PARAM_VALUE.FW_AIRSPD_MAX = single(30.0);
 FMS_PARAM_VALUE.DISARM_OUT = single([1000 1000 1500 1500 1500 1500, zeros(1, 10)]);
 FMS_PARAM_VALUE.STANDBY_OUT = single([1000 1000 1500 1500 1500 1500, zeros(1, 10)]);
 
-%TODO, remove it
-FMS_PARAM_VALUE.VEL_XY_LIM = single(5);
-
 FMS_PARAM = Simulink.Parameter(FMS_PARAM_VALUE);
 FMS_PARAM.CoderInfo.StorageClass = 'ExportedGlobal';
