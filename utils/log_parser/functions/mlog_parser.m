@@ -158,8 +158,9 @@ fclose(fileID);
 fprintf('\nLog parse finish!\n');
 % fprintf('log elapsed time: %f(s)\n', )
 for n = 1:LogHeader.num_bus
-    BusName = strrep(LogHeader.bus(n).name, '"', '');
-    BusName = BusName(~isspace(BusName));
+    % remove 0
+    BusName = strrep(LogHeader.bus(n).name, char(0), '');
+%     BusName = BusName(~isspace(BusName));
 	fprintf('%s: %d msg recorded\n', BusName, MsgCount(n));
 end
 
