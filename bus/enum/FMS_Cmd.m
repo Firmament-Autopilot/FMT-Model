@@ -9,6 +9,7 @@ classdef FMS_Cmd < Simulink.IntEnumType
         Return(1005)
         Pause(1006)
         Continue(1007)
+        SetHome(2000)
     end
   
     methods (Static)
