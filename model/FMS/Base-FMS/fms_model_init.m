@@ -30,6 +30,7 @@ FMS_PARAM_VALUE.L1 = single(10);
 FMS_PARAM_VALUE.CRUISE_SPEED = single(5);
 FMS_PARAM_VALUE.TAKEOFF_H = single(1.5);
 FMS_PARAM_VALUE.ACCEPT_R = single(0.5);
+FMS_PARAM_VALUE.ASSIST_LAND_H = single(0.3);
 
 FMS_PARAM = Simulink.Parameter(FMS_PARAM_VALUE);
 FMS_PARAM.CoderInfo.StorageClass = 'ExportedGlobal';
