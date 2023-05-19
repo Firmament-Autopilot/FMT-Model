@@ -48,6 +48,7 @@ CONTROL_PARAM_VALUE.RATE_D_MIN = single(-0.1);
 CONTROL_PARAM_VALUE.RATE_D_MAX = single(0.1);
 CONTROL_PARAM_VALUE.P_Q_CMD_LIM = single(pi/2);
 CONTROL_PARAM_VALUE.R_CMD_LIM = single(pi);
+CONTROL_PARAM_VALUE.HOVER_THRO = single(0.5);
 % Export to firmware
 CONTROL_PARAM = Simulink.Parameter(CONTROL_PARAM_VALUE);
 CONTROL_PARAM.CoderInfo.StorageClass = 'ExportedGlobal';
