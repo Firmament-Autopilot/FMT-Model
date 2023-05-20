@@ -35,3 +35,6 @@ for k = 1:row
         CONTROL_PARAM.Value.(fieldname{k}) = val;
     end
 end
+
+% Load Airframe parameter
+AIRFRAME = get_param_val(LogHeader.param_group_list, 'CONTROL', 'AIRFRAME');

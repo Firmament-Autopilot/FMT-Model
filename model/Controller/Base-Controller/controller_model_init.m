@@ -14,6 +14,9 @@ CONTROL_EXPORT_VALUE.model_info = int8([model_name, ' ', model_version, 0]); % 0
 CONTROL_EXPORT = Simulink.Parameter(CONTROL_EXPORT_VALUE);
 CONTROL_EXPORT.CoderInfo.StorageClass = 'ExportedGlobal';
 
+% Airframe id
+AIRFRAME = 1;
+
 %% Paramaters
 CONTROL_PARAM_VALUE.VEL_XY_P = single(1.4);
 CONTROL_PARAM_VALUE.VEL_XY_I = single(0.2);
