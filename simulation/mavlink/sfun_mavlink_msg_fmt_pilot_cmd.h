@@ -1,11 +1,10 @@
 /*
 DO NOT EDIT.
-This file was automatically created by the Matlab function 'create_sfun_header' on 30-Jul-2020 21:21:18
+This file was automatically created by the Matlab function 'create_sfun_header' on 05-Oct-2023 08:14:04
 as part of Simulink MAVLink library.
 */
 
-#include "D:\FirmamentPilot\tool\simulink_mavlink-master\simulink_mavlink-master\include\mavlink\v2.0\firmament\mavlink_msg_fmt_pilot_cmd.h"
-
+#include "D:\ws\FMT\simulink_mavlink\include\mavlink\v2.0\fmt\mavlink_msg_fmt_pilot_cmd.h"
 #define BUS_NAME_FMT_PILOT_CMD "mavlink_fmt_pilot_cmd_t"
 #define NFIELDS_BUS_FMT_PILOT_CMD 8
 #define ENCODED_LEN_FMT_PILOT_CMD (MAVLINK_NUM_NON_PAYLOAD_BYTES + MAVLINK_MSG_ID_FMT_PILOT_CMD_LEN)
