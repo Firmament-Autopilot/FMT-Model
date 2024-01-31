@@ -6,6 +6,7 @@ classdef NAV_Cmd < Simulink.IntEnumType
         Return(20)
         Land(21)
         Takeoff(22)
+        SetSpeed(178)
     end
   
     methods (Static)
