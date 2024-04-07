@@ -200,7 +200,7 @@ for n = 1:LogHeader.num_bus
     for k = 1:LogHeader.bus(n).num_elem
         ElemName = deblank(LogHeader.bus(n).elem_list(k).name);
         
-        exp = sprintf('timeseries(LogMsg{index}{k}'', time_stamp);');
+        exp = sprintf('timeseries2timetable(timeseries(LogMsg{index}{k}'', time_stamp));');
         if ~isempty(ElemName)
             eval([BusName, '.', ElemName, '=', exp]);
         else
