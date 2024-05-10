@@ -34,5 +34,14 @@ PLANT_EXPORT_VALUE.model_info = int8([model_name, ' ', model_version, 0]); % 0 f
 PLANT_EXPORT = Simulink.Parameter(PLANT_EXPORT_VALUE);
 PLANT_EXPORT.CoderInfo.StorageClass = 'ExportedGlobal';
 
+%% Parameter
+PLANT_PARAM_VALUE.LAT_0 = double(0.65673);
+PLANT_PARAM_VALUE.LON_0 = double(-2.1361);
+PLANT_PARAM_VALUE.ALT_0 = double(4.5);
+
+% Export to firmware
+PLANT_PARAM = Simulink.Parameter(PLANT_PARAM_VALUE);
+PLANT_PARAM.CoderInfo.StorageClass = 'ExportedGlobal';
+
 %% init sensor model
 run('sensor_model_init.m');
