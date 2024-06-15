@@ -1,5 +1,5 @@
 model_version = 'v1.0.0';
-model_name = 'Base Controller';
+model_name = 'MC Controller';
 
 %% load configuration
 load('control_default_config.mat');

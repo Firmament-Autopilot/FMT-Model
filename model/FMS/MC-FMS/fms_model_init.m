@@ -1,5 +1,5 @@
 model_version = 'v1.0.0';
-model_name = 'Base FMS';
+model_name = 'MC FMS';
 
 %% load model configuration
 load('fms_default_config.mat');
