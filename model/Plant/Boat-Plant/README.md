@@ -1,13 +1,5 @@
-# Multicopter_Model
-Multicopter model for FMT Autopilot.
+# Boat Plant Model
+This model is contributed by XXX and referenced from XXX. It is an unmanned surface vessel (USV) model featuring a single thruster and a rudder, supporting only forward motion.
 
 ## Environment
-- MATLAB 2018b
-
-## Required Toolbox
-- Aerospace Blockset (4.0)
-- DSP System Toolbox (9.7)
-- Embedded Coder (7.1)
-- MATLAB (9.5)
-- Simulink (9.2)
-- Simulink Coder (9.0)
+- MATLAB 2018b or higher
