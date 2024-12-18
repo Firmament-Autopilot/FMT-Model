@@ -119,20 +119,29 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     %%% Read Msg Payload %%%
     
     % read bus elements
-    for k = 1:LogHeader.bus(index).num_elem
-        type = LogHeader.bus(index).elem_list(k).type+1;
-        len = LogHeader.bus(index).elem_list(k).number;
-        
-        [elem_val, rb] = fread(fileID, [len, 1], TYPE_CAST(type));
-        
-        if rb < len
-            fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount(index));
-            % TODO: handle this error
-            break;
-        else
-            % LogMsg{msg_id}{elem_index}(len:cnt)
-            LogMsg{index}{k}(1:len, MsgCount(index)+1) = elem_val;
+    try
+        for k = 1:LogHeader.bus(index).num_elem
+            try
+                type = LogHeader.bus(index).elem_list(k).type + 1;
+                len = LogHeader.bus(index).elem_list(k).number;
+    
+                [elem_val, rb] = fread(fileID, [len, 1], TYPE_CAST(type));
+    
+                if rb < len
+                    fprintf('%s %s cnt %d read err, delete it\n', LogHeader.bus(index).name, LogHeader.bus(index).elem_list(k).name, MsgCount(index));
+                    % TODO: handle this error
+                    break;
+                else
+                    % LogMsg{msg_id}{elem_index}(len:cnt)
+                    LogMsg{index}{k}(1:len, MsgCount(index) + 1) = elem_val;
+                end
+            catch ME                
+                fprintf('Error reading element %d in bus %d: %s\n', k, index, ME.message);                
+                continue; 
+            end
         end
+    catch ME        
+        fprintf('Error processing bus %d: %s\n', index, ME.message);
     end
     
     %%% Read Msg End Flag %%%
@@ -143,13 +152,18 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     else
         fprintf('invalid msg end flag:%d, msg id:%d\r\n', msg_end, msg_id);
         % delete invalid msg
-        for k = 1:LogHeader.bus(index).num_elem
-            try
-                LogMsg{index}{k}(:, MsgCount(index)+1) = [];
-            catch
-                continue
+        try
+            for k = 1:LogHeader.bus(index).num_elem
+                try
+                    LogMsg{index}{k}(:, MsgCount(index) + 1) = [];
+                catch ME
+                    fprintf('Error when deleting element %d in bus %d: %s\n', k, index, ME.message);                    
+                    continue;
+                end
             end
-        end
+        catch ME
+            fprintf('Error processing bus %d: %s\n', index, ME.message);
+        end        
     end
 end
 fclose(fileID);
