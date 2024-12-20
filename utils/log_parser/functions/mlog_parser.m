@@ -103,6 +103,9 @@ while ~feof(fileID) && ftell(fileID)<fileDir.bytes
     
     %%% Read Msg ID %%%
     msg_id = fread(fileID, 1, 'uint8=>uint8');
+    if isempty(msg_id) || feof(fileID)
+        break;
+    end
     
     % msg_id start from 0 and index start from 1
     index = msg_id + 1;
