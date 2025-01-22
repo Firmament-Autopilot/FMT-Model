@@ -15,8 +15,8 @@ FMS_EXPORT = Simulink.Parameter(FMS_EXPORT_VALUE);
 FMS_EXPORT.CoderInfo.StorageClass = 'ExportedGlobal';
 
 %% Paramaters
-% FMS_PARAM_VALUE.DISARM_OUT = single([1500 1500 1500 1500, zeros(1, 12)]);
-% FMS_PARAM_VALUE.STANDBY_OUT = single([1550 1550 1500 1500, zeros(1, 12)]);
+FMS_PARAM_VALUE.DISARM_OUT = single([1000 1500, zeros(1, 14)]);
+FMS_PARAM_VALUE.STANDBY_OUT = single([1000 1500, zeros(1, 14)]);
 
 FMS_PARAM_VALUE.L1 = single(10);
 FMS_PARAM_VALUE.CRUISE_SPEED = single(3);
