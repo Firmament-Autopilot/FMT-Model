@@ -23,10 +23,10 @@ llo = [lat0, lon0];
 psi0 = 0;
 href = 0;
 sp_waypoint = lla2flat(lla, llo, psi0, href);
-sp_waypoint_x = [sp_waypoint(:, 1); x_R(1, 1)];%º½µã¼ÓÉÏ·´º½µã
-sp_waypoint_y = [sp_waypoint(:, 2); y_R(1, 1)];%º½µã¼ÓÉÏ·´º½µã
-%sp_waypoint_x = sp_waypoint(:, 1);%´¿º½µã
-%sp_waypoint_y = sp_waypoint(:, 2);%´¿º½µã
+%sp_waypoint_x = [sp_waypoint(:, 1); x_R(1, 1)];%º½µã¼ÓÉÏ·µº½Ä¿±êµã
+%sp_waypoint_y = [sp_waypoint(:, 2); y_R(1, 1)];%º½µã¼ÓÉÏ·µº½Ä¿±êµã
+sp_waypoint_x = sp_waypoint(:, 1);%´¿º½µã
+sp_waypoint_y = sp_waypoint(:, 2);%´¿º½µã
 % ´´½¨Í¼ĞÎ
 figure;
 
@@ -39,6 +39,22 @@ plot(sp_waypoint_y, sp_waypoint_x, 'r', 'LineWidth', 1); % ĞÂµÄÊı¾İ£¬ÒÔºìÉ«Ö±ÏßÁ
 
 % ÔÚÃ¿¸ö sp_waypoint µãÉÏÌí¼Ó±ê¼Ç
 plot(sp_waypoint_y, sp_waypoint_x, 'ro', 'MarkerFaceColor', 'r', 'MarkerSize', 8); % ºìÉ«Ô²µã±ê¼Ç£¬´óĞ¡Îª8
+
+% È·±£ sp_waypoint_x ºÍ sp_waypoint_y ÊÇË«¾«¶ÈÊıÖµ
+sp_waypoint_x = double(sp_waypoint_x);
+sp_waypoint_y = double(sp_waypoint_y);
+
+% °´Ë³ĞòÎªÃ¿¸ö sp_waypoint Ìí¼ÓÊı×Ö±êÇ©
+for i = 1:length(sp_waypoint_x)
+    % ¼ì²éÊı¾İÊÇ·ñÓĞĞ§£¨¼´²»ÊÇ NaN »ò Inf£©
+    if ~isnan(sp_waypoint_x(i)) && ~isnan(sp_waypoint_y(i)) && isfinite(sp_waypoint_x(i)) && isfinite(sp_waypoint_y(i))
+        % ÔÚÓĞĞ§µÄµãÉÏÌí¼Ó±êÇ©
+        text(sp_waypoint_y(i), sp_waypoint_x(i), num2str(i), ...
+            'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', ...
+            'FontSize', 15, 'FontWeight', 'bold', 'Color', 'black');
+    end
+end
+
 
 % Ìí¼Ó±êÌâºÍ±êÇ©
 title('Plot of x_R vs. y_R and llax vs. llay');
