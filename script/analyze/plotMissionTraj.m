@@ -1,5 +1,5 @@
 % 获取数据
-ref_INS_Out = get(logsout, 'INS_Out_Ref');
+ref_INS_Out = get(logsout, 'INS_Out');
 ref_Mission_data = get(logsout, 'Mission_Data');
 
 llax = ref_Mission_data.Values.x * 1e-7;
