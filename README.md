@@ -25,7 +25,7 @@ FMT-Model is developed in MATLAB 2018b, which is the recommend version. However,
 For other toolboxes required by the model, please check the *README.md* inside the submodules.
 
 ## Document
-[User Guide](https://firmament-autopilot.github.io/FMT-DOCS/#/)
+[User Guide](https://docs.sieon.net/fmt)
 
 ## Quick Start
 To get the FMT-Model, use the following command. This will clone the code base of FMT-Model with all submodules (INS, FMS, Controller, Plant).
