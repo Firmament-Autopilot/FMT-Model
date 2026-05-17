@@ -4,16 +4,16 @@ Sensor_Model.g = 9.80665;
 Sensor_Model.IMU.Sampletime = 0.002;
 
 %% Gyroscope Model Parameter
-Sensor_Model.Gyro.Vibration.Gain = [0.5;0.5;0.5];
+Sensor_Model.Gyro.Vibration.Gain = [0.2;0.2;0.2];
 Sensor_Model.Gyro.Bias = [0;0;0];
 Sensor_Model.Gyro.Scalefactor_Error = zeros(3);
 Sensor_Model.Gyro.Range = 2000*pi/180; % 2000dps
 Sensor_Model.Gyro.Cutoff_frequency_Hz = 50; % TODO, 256 don't work
-Sensor_Model.Gyro.Variance = [0.005;0.005;0.005].^2;
+Sensor_Model.Gyro.Variance = [0.002;0.002;0.002].^2;
 Sensor_Model.Gyro.Seed = [2123;2234;2345];
 
 %% Accelerometer Model Parameter
-Sensor_Model.Acc.Vibration.Gain = [20; 20; 15];
+Sensor_Model.Acc.Vibration.Gain = [1; 1; 2];
 Sensor_Model.Acc.Bias = [0;0;0];
 Sensor_Model.Acc.Scalefactor_Error = zeros(3);
 Sensor_Model.Acc.Upper_limit = 8*9.80665;   % +-8g
