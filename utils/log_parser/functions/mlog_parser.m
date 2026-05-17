@@ -172,6 +172,10 @@ end
 
 function generate_MAT(LogHeader, LogMsg, Path)
 %% create Bus variable and save into .mat file
+global_timestamp_start = find_global_timestamp_start(LogHeader, LogMsg);
+LogHeader.global_timestamp_start = global_timestamp_start;
+fprintf("Global timestamp start:%d(ms)\n", global_timestamp_start);
+
 save(strcat(Path, '/LogHeader.mat'), 'LogHeader'); % save log header
 
 for n = 1:LogHeader.num_bus
@@ -184,19 +188,21 @@ for n = 1:LogHeader.num_bus
     BusName = deblank(LogHeader.bus(n).name);
     
     % find timestamp
-    timestamp_id = 0;
-    for k = 1:LogHeader.bus(n).num_elem
-        ElemName = deblank(LogHeader.bus(n).elem_list(k).name);
-        if strcmp(ElemName, "timestamp_ms") || strcmp(ElemName, "timestamp")
-            timestamp_id = k;
-        end
-    end
+    timestamp_id = find_timestamp_element(LogHeader.bus(n));
     
     if timestamp_id <= 0
        fprintf("can't find timestamp element in %s\n", LogHeader.bus(n).name);
        continue;
+    elseif isempty(LogMsg{index}{timestamp_id})
+       fprintf("empty timestamp element in %s\n", LogHeader.bus(n).name);
+       continue;
     else
-       time_stamp = double(LogMsg{index}{timestamp_id}-LogMsg{index}{timestamp_id}(1)) * 0.001;   % milli second to second
+       timestamp_data = LogMsg{index}{timestamp_id};
+       if is_initialization_timestamp(timestamp_data, global_timestamp_start)
+           time_stamp = zeros(size(timestamp_data));   % keep initialization-only topics readable
+       else
+           time_stamp = double(timestamp_data - global_timestamp_start) * 0.001;   % milli second to second
+       end
     end
     
     % construct Bus variable
@@ -217,5 +223,61 @@ for n = 1:LogHeader.num_bus
     save(out_file, BusName);
     fprintf("Save to path:%s\n", out_file);
 end    
+end
+
+function global_timestamp_start = find_global_timestamp_start(LogHeader, LogMsg)
+% Use a shared time origin for all logged buses. The file header timestamp can
+% be zero, so derive the origin from real multi-sample topics instead.
+global_timestamp_start = [];
+
+for n = 1:LogHeader.num_bus
+    msg_id = LogHeader.bus(n).msg_id;
+    index = msg_id + 1;
+    if index > numel(LogMsg) || isempty(LogMsg{index})
+        continue;
+    end
+
+    timestamp_id = find_timestamp_element(LogHeader.bus(n));
+    if timestamp_id <= 0 || isempty(LogMsg{index}{timestamp_id})
+        continue;
+    end
+
+    timestamp_data = LogMsg{index}{timestamp_id};
+    if numel(timestamp_data) <= 1 || all(timestamp_data(:) == 0)
+        continue;
+    end
+
+    first_timestamp = timestamp_data(1);
+    if first_timestamp == 0
+        continue;
+    end
+
+    if isempty(global_timestamp_start) || first_timestamp < global_timestamp_start
+        global_timestamp_start = first_timestamp;
+    end
+end
+
+if isempty(global_timestamp_start)
+    if LogHeader.timestamp ~= 0
+        global_timestamp_start = LogHeader.timestamp;
+    else
+        global_timestamp_start = uint32(0);
+    end
+end
+end
+
+function timestamp_id = find_timestamp_element(BusHeader)
+timestamp_id = 0;
+for k = 1:BusHeader.num_elem
+    ElemName = deblank(BusHeader.elem_list(k).name);
+    if strcmp(ElemName, "timestamp_ms") || strcmp(ElemName, "timestamp")
+        timestamp_id = k;
+        return;
+    end
+end
+end
+
+function res = is_initialization_timestamp(timestamp_data, global_timestamp_start)
+res = isscalar(timestamp_data) && timestamp_data(1) < global_timestamp_start;
 end
 
