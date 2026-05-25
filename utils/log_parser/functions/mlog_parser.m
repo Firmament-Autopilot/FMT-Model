@@ -195,6 +195,9 @@ for n = 1:LogHeader.num_bus
     if timestamp_id <= 0
        fprintf("can't find timestamp element in %s\n", LogHeader.bus(n).name);
        continue;
+    elseif isempty(LogMsg{index}{timestamp_id})
+       % empty bus, skip it
+       continue;
     else
        time_stamp = double(LogMsg{index}{timestamp_id}-LogMsg{index}{timestamp_id}(1)) * 0.001;   % milli second to second
     end
