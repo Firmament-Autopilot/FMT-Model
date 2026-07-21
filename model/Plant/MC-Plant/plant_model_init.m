@@ -25,6 +25,11 @@ plant_model.motorWb = 88.448;  %Motor speed-throttle curve constant term(rad/s)
 plant_model.motorT = 0.02;  %Motor inertia time constant(s)
 plant_model.motorJm = 0.0001287;    %Moment of inertia of motor rotor + propeller(kg.m^2)
 
+%% Ground force model parameters
+plant_model.dh = 0.2; %reference height of gravity center or assembly point of altimeter.
+ground_force.Kspring = plant_model.mass*9.8*1000; %Spring coefficient calculated based on 0.1cm compression when pressed on the ground
+ground_force.Kdamp = 300*plant_model.mass; %damp coefficient of ground force model
+
 %% Exported Value
 PLANT_EXPORT_VALUE.period = uint32(PLANT_CONST.dt*1e3); 
 PLANT_EXPORT_VALUE.model_info = int8([model_name, ' ', model_version, 0]); % 0 for end of string
