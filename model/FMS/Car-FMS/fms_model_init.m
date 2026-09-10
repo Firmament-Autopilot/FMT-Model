@@ -25,6 +25,14 @@ FMS_PARAM_VALUE.YAW_P = single(1.0);
 FMS_PARAM_VALUE.MAX_VEL = single(4);
 FMS_PARAM_VALUE.MAX_R = single(pi/4);
 FMS_PARAM_VALUE.AY_P = single(0.5);
+FMS_PARAM_VALUE.TRAJ_PREVIEW_T = single(0.2);
+FMS_PARAM_VALUE.TRAJ_U_I = single(0.05);
+FMS_PARAM_VALUE.TRAJ_U_I_MAX = single(2.0);
+FMS_PARAM_VALUE.TRAJ_U_I_MIN = single(-2.0);
+FMS_PARAM_VALUE.TRAJ_PSI_P = single(1.0); % offboard TrajTrack: heading-error P gain
+FMS_PARAM_VALUE.TRAJ_CTE_P = single(1.5);  % offboard TrajTrack: cross-track P gain
+FMS_PARAM_VALUE.TRAJ_CTE_I = single(1.5);
+FMS_PARAM_VALUE.TRAJ_CTE_D = single(0.0);
 
 %TODO, remove it
 % FMS_PARAM_VALUE.VEL_XY_LIM = single(5);
