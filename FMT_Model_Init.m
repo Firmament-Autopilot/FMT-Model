@@ -19,11 +19,12 @@ buildpath = fullfile(rootpath, 'build');
 if(~exist(buildpath, 'dir'))
    mkdir(buildpath); 
 end
-set_param(0, 'CodeGenFolder', buildpath);
-set_param(0, 'CacheFolder', buildpath);
+codegenpath = fullfile(buildpath, 'fmt', Vehicle);
+if ~exist(codegenpath, 'dir'), mkdir(codegenpath); end
+set_param(0, 'CodeGenFolder', codegenpath);
+set_param(0, 'CacheFolder', codegenpath);
 
 %% add path
-addpath(genpath('build'));
 addpath(fullfile(rootpath, 'script', 'fmt_coder'));
 
 if strcmp(Vehicle, 'Multicopter')

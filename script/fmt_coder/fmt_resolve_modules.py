@@ -9,7 +9,7 @@ import sys
 import types
 
 
-def resolve_modules(firmware_root, board, vehicle, sim_mode):
+def resolve_modules(firmware_root, board, vehicle, sim_mode, airframe=1):
     if Path(board).is_absolute() or '..' in Path(board).parts:
         raise ValueError('The board must be a relative path inside target/.')
     root = Path(firmware_root).resolve()
@@ -20,7 +20,7 @@ def resolve_modules(firmware_root, board, vehicle, sim_mode):
     if not (board_dir / 'SConstruct').is_file():
         raise ValueError(f'Board SConstruct not found: {board_dir}')
     config_file = board_dir / 'config' / 'model.py'
-    options = {'vehicle': vehicle, 'sim': sim_mode}
+    options = {'vehicle': vehicle, 'sim': sim_mode, 'airframe': airframe}
     shim = types.ModuleType('building')
     shim.GetOption = lambda name: options[name]
     sentinel = object()
@@ -35,7 +35,7 @@ def resolve_modules(firmware_root, board, vehicle, sim_mode):
         else:
             sys.modules['building'] = previous
     modules = config.get('MODELS')
-    if not isinstance(modules, list) or not all(isinstance(x, str) for x in modules):
+    if not isinstance(modules, (list, tuple)) or not all(isinstance(x, str) for x in modules):
         raise ValueError('The board config must define a list of model modules.')
     model_root = (root / 'src' / 'model').resolve()
     for module in modules:
@@ -51,9 +51,11 @@ if __name__ == '__main__':
     parser.add_argument('--board', required=True)
     parser.add_argument('--vehicle', required=True)
     parser.add_argument('--sim', default='None')
+    parser.add_argument('--airframe', type=int, default=1)
     args = parser.parse_args()
     try:
-        print(json.dumps(resolve_modules(args.firmware_root, args.board, args.vehicle, args.sim)))
+        print(json.dumps(resolve_modules(args.firmware_root, args.board, args.vehicle,
+                                         args.sim, args.airframe)))
     except Exception as exc:
         print(f'FMT model selection failed: {exc}', file=sys.stderr)
         sys.exit(1)

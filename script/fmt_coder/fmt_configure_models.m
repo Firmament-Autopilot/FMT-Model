@@ -16,7 +16,8 @@ p = inputParser;
 p.addParameter('FirmwareRoot', '');
 p.addParameter('Board', '');
 p.addParameter('Vehicle', vehicle);
-p.addParameter('Airframe', []);
+p.addParameter('Airframe', [], @(x) isempty(x) || ...
+    (isnumeric(x) && isscalar(x) && isfinite(x) && x >= 1 && x == fix(x)));
 p.addParameter('SimulationMode', '');
 p.parse(varargin{:});
 settings = p.Results;
@@ -53,9 +54,11 @@ if ~isempty(settings.FirmwareRoot)
         'FirmwareRoot does not exist.');
     setpref('FMT', 'FirmwareRoot', char(settings.FirmwareRoot));
 end
-% Let Coder separate incompatible shared-code configurations automatically.
-Simulink.fileGenControl('set', 'CodeGenFolderStructure', ...
-    Simulink.filegen.CodeGenFolderStructure.TargetEnvironmentSubfolder);
+Simulink.fileGenControl('set', 'CodeGenFolder', ...
+    fullfile(rootDir, 'build', 'fmt', settings.Vehicle), ...
+    'CacheFolder', fullfile(rootDir, 'build', 'fmt', settings.Vehicle), ...
+    'CodeGenFolderStructure', Simulink.filegen.CodeGenFolderStructure.ModelSpecific, ...
+    'createDir', true);
 
 for k = 1:numel(catalog)
     mdl = catalog(k).name;
@@ -74,10 +77,14 @@ for k = 1:numel(catalog)
     end
     setActiveConfigSet(mdl, configName);
     if ~strcmp(get_param(config, 'SystemTargetFile'), 'fmt_ert.tlc')
+        tunabilityDiagnostic = get_param(config, 'ParameterTunabilityLossMsg');
         switchTarget(config, 'fmt_ert.tlc', []);
+        % switchTarget resets this diagnostic; preserve the owning model's policy.
+        set_param(config, 'ParameterTunabilityLossMsg', tunabilityDiagnostic);
     end
     set_param(config, 'GenCodeOnly', 'off', 'GenerateMakefile', 'off', ...
         'GenerateSampleERTMain', 'off', 'TargetLang', 'C', ...
+        'ProdIntDivRoundTo', 'Zero', 'TargetIntDivRoundTo', 'Zero', ...
         'CodeReplacementLibrary', 'STM32 DSP LIB', ...
         'UtilityFuncGeneration', 'Shared location', 'FMTVehicle', settings.Vehicle);
     if ~isempty(settings.Board), set_param(config, 'FMTBoard', char(settings.Board)); end
@@ -87,7 +94,15 @@ for k = 1:numel(catalog)
     if ~isempty(settings.SimulationMode)
         set_param(config, 'FMTSimMode', char(settings.SimulationMode));
     end
-    if saveChanges, save_system(mdl); end
+    if k == 1
+        settings.Board = get_param(config, 'FMTBoard');
+        settings.Airframe = str2double(string(get_param(config, 'FMTAirframe')));
+        settings.SimulationMode = get_param(config, 'FMTSimMode');
+    end
     fprintf('FMT configured: %s (%s)\n', mdl, settings.Vehicle);
+end
+if ispref('FMT', 'FirmwareRoot'), fmt_firmware_modules('Controller'); end
+if saveChanges
+    for k = 1:numel(catalog), save_system(catalog(k).name); end
 end
 end

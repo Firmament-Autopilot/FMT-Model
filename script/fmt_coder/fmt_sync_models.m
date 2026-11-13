@@ -39,7 +39,7 @@ for k = 1:numel(modelNames)
     destination = fullfile(options.firmwareRoot, 'src', 'model', entry.module, 'lib');
     assert(isfolder(destination), 'FMT:MissingModule', ...
         'Firmware model library not found: %s', destination);
-    validateInterface(entry, src, fileparts(destination));
+    validateInterface(entry, src, fileparts(destination), options.airframe);
     stage = tempname(stageRoot);
     mkdir(stage);
     files = sourceFiles(src);
@@ -125,7 +125,9 @@ try
         end
         if ~isfolder(fileparts(dst)), mkdir(fileparts(dst)); end
         if isfolder(dst)
-            records(k).backup = tempname(workRoot);
+            [~, label] = fileparts(fileparts(dst));
+            [~, uniquePart] = fileparts(tempname(workRoot));
+            records(k).backup = fullfile(workRoot, [label '_' uniquePart]);
             movefile(dst, records(k).backup);
         end
         records(k).touched = true;
@@ -259,11 +261,17 @@ for k = 1:numel(aNames)
 end
 end
 
-function validateInterface(entry, source, moduleRoot)
+function validateInterface(entry, source, moduleRoot, airframe)
 headers = dir(fullfile(source, '*.h'));
 generated = '';
 for k = 1:numel(headers)
     generated = [generated newline fileread(fullfile(source, headers(k).name))]; %#ok<AGROW>
+end
+if strcmp(entry.name, 'Controller')
+    tokens = regexp(generated, 'AIRFRAME\s*==\s*(\d+)', 'tokens');
+    frames = unique(cellfun(@(token) str2double(token{1}), tokens));
+    assert(isempty(frames) || any(airframe == frames), 'FMT:UnsupportedAirframe', ...
+        'Airframe %d is absent from the generated Controller variants.', airframe);
 end
 if strcmp(entry.name, 'Controller'), stem = 'control'; else, stem = lower(entry.name); end
 interface = fileread(fullfile(moduleRoot, [stem '_interface.c']));

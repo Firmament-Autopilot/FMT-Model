@@ -20,6 +20,12 @@ modules = fmt_firmware_modules(ownerModel);
 catalog = fmt_model_catalog(options.vehicle);
 selected = catalog(ismember({catalog.module}, modules));
 assert(~isempty(selected), 'FMT:NoModels', 'No supported source models were selected.');
+fprintf('FMT target: %s | %s | airframe %d | %s\n', ...
+    options.board, options.vehicle, options.airframe, options.sim);
+existing = setdiff(modules, {selected.module}, 'stable');
+for k = 1:numel(existing)
+    fprintf('FMT using existing Firmware module: %s\n', existing{k});
+end
 
 % All slbuild calls run outside the target's build hook.
 setappdata(0, 'FMTCodegenBatch', true);

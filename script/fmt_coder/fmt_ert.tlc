@@ -1,7 +1,7 @@
 %% SYSTLC: FMT Firmware Target TMF: ert_default_tmf MAKE: make_rtw
 %%
-%% 
-%% 
+%%
+%%
 %%
 %% Copyright 1994-2024 The MathWorks, Inc.
 %% Abstract: Embedded real-time system target file for FMT project.
@@ -27,7 +27,7 @@
 
 %% The model_SetEventsForThisBaseRate function is not required for the
 %% VxWorks environment, i.e., when using an operating system.
-%assign SuppressSetEventsForThisBaseRateFcn = (TargetOS == "VxWorksExample") 
+%assign SuppressSetEventsForThisBaseRateFcn = (TargetOS == "VxWorksExample")
 %if !EXISTS(InlineSetEventsForThisBaseRateFcn)
   %assign InlineSetEventsForThisBaseRateFcn  = TLC_TRUE
 %endif
@@ -35,13 +35,13 @@
   %assign SuppressMultiTaskScheduler = TLC_TRUE
 %endif
 
-%assign TargetRegistMutexOp   = 1 
+%assign TargetRegistMutexOp   = 1
 %assign TargetRegistSynchroOp = 1
 
 %include "codegenentry.tlc"
 
 %% The contents between 'BEGIN_RTW_OPTIONS' and 'END_RTW_OPTIONS' in this file
-%% are used to maintain backward compatibility to R13 and preR13 custom target 
+%% are used to maintain backward compatibility to R13 and preR13 custom target
 %% file only.  If you want to use this file as a template to develop your
 %% own system target file, you need to remove the 'CONFIGSET_TARGET_COMPONENT'
 %% section at the end of this file.
@@ -66,16 +66,19 @@
   rtwoptions(2).prompt      = 'Board';
   rtwoptions(2).default     = 'sieon/s1';
   rtwoptions(2).tlcvariable = 'FMTBoard';
+  rtwoptions(2).tooltip     = 'Relative BSP directory under Firmware/target, for example sieon/s1';
 
   rtwoptions(3).prompt      = 'Vehicle';
   rtwoptions(3).default     = 'Multicopter';
   rtwoptions(3).type       = 'Popup';
   rtwoptions(3).popupstrings = 'Multicopter|Fixwing|VTOL|Car|Boat';
   rtwoptions(3).tlcvariable = 'FMTVehicle';
+  rtwoptions(3).tooltip     = 'Load the matching source models with fmt_configure_models when changing vehicle';
 
   rtwoptions(4).prompt      = 'Airframe';
   rtwoptions(4).default     = '1';
   rtwoptions(4).tlcvariable = 'FMTAirframe';
+  rtwoptions(4).tooltip     = 'Existing Controller variant number, passed to the native --airframe option';
 
   rtwoptions(5).prompt       = 'Simulation mode';
   rtwoptions(5).type         = 'Popup';
@@ -92,7 +95,7 @@
   END_RTW_OPTIONS
 %/
 
-%% The content between 'BEGIN_CONFIGSET_TARGET_COMPONENT' and 
+%% The content between 'BEGIN_CONFIGSET_TARGET_COMPONENT' and
 %% 'END_CONFIGSET_TARGET_COMPONENT' is for the MathWorks internal use
 %% only.  You must remove this section if you intend to use this file
 %% as a template for your own system target development.

@@ -3,6 +3,7 @@
 import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import types
 import unittest
 from unittest.mock import patch
@@ -69,6 +70,24 @@ class FirmwareSelectionTests(unittest.TestCase):
             with self.subTest(mode=mode):
                 self.assertIn('plant/multicopter', resolver.resolve_modules(
                     FIRMWARE_ROOT, 'sieon/s1', 'Multicopter', mode))
+
+    def test_airframe_reaches_the_original_selection_script(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            board = root / 'target' / 'mock' / 'board'
+            (board / 'config').mkdir(parents=True)
+            (board / 'SConstruct').touch()
+            (board / 'config' / 'model.py').write_text(
+                "from building import GetOption\n"
+                "MODELS = ['seven' if GetOption('airframe') == 7 else 'one']\n",
+                encoding='utf-8')
+            for module in ['one', 'seven']:
+                location = root / 'src' / 'model' / module
+                location.mkdir(parents=True)
+                (location / 'SConscript').touch()
+            self.assertEqual(resolver.resolve_modules(root, 'mock/board',
+                                                     'Multicopter', 'None', 7),
+                             ['seven'])
 
 
 if __name__ == '__main__':
