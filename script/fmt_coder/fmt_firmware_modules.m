@@ -1,0 +1,12 @@
+function modules = fmt_firmware_modules(modelName)
+%fmt_firmware_modules - Query the board's existing SCons module selection
+options = fmt_build_options(modelName);
+helper = fullfile(fileparts(mfilename('fullpath')), 'fmt_resolve_modules.py');
+command = sprintf(['python "%s" --firmware-root "%s" --board "%s" ' ...
+    '--vehicle "%s" --sim "%s"'], helper, options.firmwareRoot, ...
+    options.board, options.vehicle, options.sim);
+[status, output] = system(command);
+assert(status == 0, 'FMT:ModelSelectionFailed', ...
+    'Cannot read the board model selection: %s', output);
+modules = cellstr(string(jsondecode(output)));
+end

@@ -1,0 +1,98 @@
+%% SYSTLC: FMT Firmware Target TMF: ert_default_tmf MAKE: make_rtw
+%%
+%% 
+%% 
+%%
+%% Copyright 1994-2024 The MathWorks, Inc.
+%% Abstract: Embedded real-time system target file for FMT project.
+%%
+%selectfile NULL_FILE
+
+%assign CodeFormat = "Embedded-C"
+
+%assign TargetType = "RT"
+%assign Language   = "C"
+%assign PreCodeGenExecCompliant = 1
+
+%if !EXISTS(AutoBuildProcedure)
+  %if EXISTS(GenerateSampleERTMain)
+    %assign AutoBuildProcedure = !GenerateSampleERTMain
+  %else
+    %% This is for the targets that use ert.tlc and are required to work
+    %% without Embedded Coder. This is to enable auto build procedure since
+    %% the GenerateSampleERTMain is always set to true for these targets.
+    %assign AutoBuildProcedure = TLC_TRUE
+  %endif
+%endif
+
+%% The model_SetEventsForThisBaseRate function is not required for the
+%% VxWorks environment, i.e., when using an operating system.
+%assign SuppressSetEventsForThisBaseRateFcn = (TargetOS == "VxWorksExample") 
+%if !EXISTS(InlineSetEventsForThisBaseRateFcn)
+  %assign InlineSetEventsForThisBaseRateFcn  = TLC_TRUE
+%endif
+%if !EXISTS(SuppressMultiTaskScheduler)
+  %assign SuppressMultiTaskScheduler = TLC_TRUE
+%endif
+
+%assign TargetRegistMutexOp   = 1 
+%assign TargetRegistSynchroOp = 1
+
+%include "codegenentry.tlc"
+
+%% The contents between 'BEGIN_RTW_OPTIONS' and 'END_RTW_OPTIONS' in this file
+%% are used to maintain backward compatibility to R13 and preR13 custom target 
+%% file only.  If you want to use this file as a template to develop your
+%% own system target file, you need to remove the 'CONFIGSET_TARGET_COMPONENT'
+%% section at the end of this file.
+%%
+/%
+  BEGIN_RTW_OPTIONS
+
+  rtwgensettings.BuildDirSuffix = '_fmt_ert_rtw';
+  rtwgensettings.DerivedFrom = 'ert.tlc';
+  rtwgensettings.Version = '1';
+  rtwgensettings.SelectCallback = 'fmt_ert_select_callback(hDlg,hSrc)';
+
+  rtwoptions = repmat(struct( ...
+      'prompt', '', 'type', 'Edit', 'enable', 'on', ...
+      'default', '', 'popupstrings', '', 'tlcvariable', '', ...
+      'tooltip', '', 'callback', '', 'makevariable', ''), 1, 6);
+
+  rtwoptions(1).prompt  = 'FMT Firmware';
+  rtwoptions(1).type    = 'Category';
+  rtwoptions(1).default = 5;
+
+  rtwoptions(2).prompt      = 'Board';
+  rtwoptions(2).default     = 'sieon/s1';
+  rtwoptions(2).tlcvariable = 'FMTBoard';
+
+  rtwoptions(3).prompt      = 'Vehicle';
+  rtwoptions(3).default     = 'Multicopter';
+  rtwoptions(3).type       = 'Popup';
+  rtwoptions(3).popupstrings = 'Multicopter|Fixwing|VTOL|Car|Boat';
+  rtwoptions(3).tlcvariable = 'FMTVehicle';
+
+  rtwoptions(4).prompt      = 'Airframe';
+  rtwoptions(4).default     = '1';
+  rtwoptions(4).tlcvariable = 'FMTAirframe';
+
+  rtwoptions(5).prompt       = 'Simulation mode';
+  rtwoptions(5).type         = 'Popup';
+  rtwoptions(5).default      = 'None';
+  rtwoptions(5).popupstrings = 'None|SIH|HIL|VR|Plant';
+  rtwoptions(5).tlcvariable  = 'FMTSimMode';
+
+  rtwoptions(6).prompt       = 'Build action';
+  rtwoptions(6).type         = 'Popup';
+  rtwoptions(6).default      = 'Build';
+  rtwoptions(6).popupstrings = 'CodeOnly|Build';
+  rtwoptions(6).tlcvariable  = 'FMTBuildAction';
+
+  END_RTW_OPTIONS
+%/
+
+%% The content between 'BEGIN_CONFIGSET_TARGET_COMPONENT' and 
+%% 'END_CONFIGSET_TARGET_COMPONENT' is for the MathWorks internal use
+%% only.  You must remove this section if you intend to use this file
+%% as a template for your own system target development.

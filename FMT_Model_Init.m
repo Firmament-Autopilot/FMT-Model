@@ -2,7 +2,9 @@
 %% brief: run this script to init FMT Model
 
 % Select vehicle type: Multicopter | Fixwing | VTOL | Car | Boat
-Vehicle = 'Multicopter';
+if ~exist('Vehicle', 'var')
+    Vehicle = 'Multicopter';
+end
 
 start_time = 0;
 end_time = 1000;
@@ -22,6 +24,7 @@ set_param(0, 'CacheFolder', buildpath);
 
 %% add path
 addpath(genpath('build'));
+addpath(fullfile(rootpath, 'script', 'fmt_coder'));
 
 if strcmp(Vehicle, 'Multicopter')
     addpath(genpath('model/Controller/MC-Controller'));
