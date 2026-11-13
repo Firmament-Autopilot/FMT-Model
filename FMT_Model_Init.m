@@ -69,3 +69,4 @@ run('control_init.m');
 run('fms_init.m');
 
 sl_refresh_customizations;
+setappdata(0, 'FMTInitializedVehicle', Vehicle);

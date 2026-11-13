@@ -1,6 +1,7 @@
 """Integration tests against the current Firmware SCons configuration."""
 
 import importlib.util
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -9,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 MODEL_ROOT = Path(__file__).resolve().parents[2]
-FIRMWARE_ROOT = MODEL_ROOT.parent / 'FMT-Firmware'
+FIRMWARE_ROOT = Path(os.environ.get('FMT_FIRMWARE_ROOT', MODEL_ROOT.parent / 'FMT-Firmware'))
 HELPER = MODEL_ROOT / 'script' / 'fmt_coder' / 'fmt_resolve_modules.py'
 spec = importlib.util.spec_from_file_location('fmt_resolve_modules', HELPER)
 resolver = importlib.util.module_from_spec(spec)
