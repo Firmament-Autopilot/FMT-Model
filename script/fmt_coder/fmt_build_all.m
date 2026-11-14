@@ -1,23 +1,25 @@
-function binPath = fmt_build_all(ownerModel, varargin)
+function binPath = fmt_build_all(varargin)
 %fmt_build_all - Generate all selected models and compile firmware once
 %   binPath = fmt_build_all builds the target configured on Controller.
-%   fmt_build_all('Board','sieon/s1','Vehicle','Multicopter','Airframe',1)
-%   configures the requested target in memory and builds it in one call.
-if nargin < 1, ownerModel = 'Controller'; end
-if ~any(strcmp(ownerModel, {'Controller','FMS','INS','Plant'}))
-    varargin = [{ownerModel}, varargin];
-    ownerModel = 'Controller';
-end
+%
+%   binPath = fmt_build_all(...,Board=BOARD,Vehicle=VEHICLE,Airframe=AIRFRAME)
+%   applies target settings in memory and builds the selected models.
+%
+%   See also fmt_configure_models, slbuild
 assert(~isappdata(0, 'FMTCodegenBatch'), 'FMT:RecursiveBuild', ...
     'Another FMT batch build is already active.');
-if ~bdIsLoaded(ownerModel) || ~isempty(varargin)
-    fmt_configure_models(false, varargin{:});
+assert(isempty(varargin) || ~any(strcmpi(string(varargin(1:2:end)), 'Save')), ...
+    'FMT:InvalidBuildOption', 'Save is an option of fmt_configure_models only.');
+if isempty(varargin) && bdIsLoaded('Controller') && ...
+        strcmp(get_param('Controller', 'SystemTargetFile'), 'fmt_ert.tlc')
+    previous = fmt_target.options('Controller');
+    varargin = {'Board', previous.board, 'Vehicle', previous.vehicle, ...
+        'Airframe', previous.airframe, 'SimulationMode', previous.sim};
 end
-options = fmt_build_options(ownerModel);
-fmt_configure_models(false, 'Board', options.board, 'Vehicle', options.vehicle, ...
-    'Airframe', options.airframe, 'SimulationMode', options.sim);
-modules = fmt_firmware_modules(ownerModel);
-catalog = fmt_model_catalog(options.vehicle);
+fmt_configure_models('Save', false, varargin{:});
+options = fmt_target.options('Controller');
+modules = fmt_target.modules(options);
+catalog = fmt_target.catalog(options.vehicle);
 selected = catalog(ismember({catalog.module}, modules));
 assert(~isempty(selected), 'FMT:NoModels', 'No supported source models were selected.');
 fprintf('FMT target: %s | %s | airframe %d | %s\n', ...
@@ -35,6 +37,6 @@ for k = 1:numel(selected)
     slbuild(selected(k).name, 'GenerateCodeOnly', true);
 end
 clear releaseBatch;
-fmt_sync_models({selected.name}, ownerModel);
-binPath = fmt_build_firmware(ownerModel);
+fmt_target.sync({selected.name}, 'Controller');
+binPath = fmt_target.build('Controller');
 end

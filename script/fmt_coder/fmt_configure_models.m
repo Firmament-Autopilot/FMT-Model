@@ -1,18 +1,20 @@
 function fmt_configure_models(varargin)
 %fmt_configure_models - Configure existing models for native Coder builds
-%   fmt_configure_models('Board','sieon/s1','Vehicle','Multicopter', ...
-%       'Airframe',1) saves local FMT configurations. Shared configurations
-%   remain available. fmt_configure_models(false,...) leaves files unsaved.
-saveChanges = true;
-if ~isempty(varargin) && islogical(varargin{1})
-    saveChanges = varargin{1};
-    varargin(1) = [];
-end
+%   fmt_configure_models configures and saves the current vehicle models.
+%
+%   fmt_configure_models(...,Vehicle=VEHICLE,Board=BOARD,Airframe=AIRFRAME)
+%   selects existing source models and applies the requested target.
+%
+%   fmt_configure_models(...,Save=false) applies settings without saving.
+%
+%   See also fmt_build_all, slbuild
 vehicle = 'Multicopter';
 if evalin('base', 'exist(''Vehicle'', ''var'')')
     vehicle = evalin('base', 'Vehicle');
 end
 p = inputParser;
+p.PartialMatching = false;
+p.addParameter('Save', true, @(x) islogical(x) && isscalar(x));
 p.addParameter('FirmwareRoot', '');
 p.addParameter('Board', '');
 p.addParameter('Vehicle', vehicle);
@@ -22,7 +24,7 @@ p.addParameter('SimulationMode', '');
 p.parse(varargin{:});
 settings = p.Results;
 settings.Vehicle = char(settings.Vehicle);
-catalog = fmt_model_catalog(settings.Vehicle);
+catalog = fmt_target.catalog(settings.Vehicle);
 
 needsInit = ~evalin('base', 'exist(''control_config'', ''var'')') || ...
     ~strcmp(vehicle, settings.Vehicle) || ...
@@ -112,8 +114,13 @@ for k = 1:numel(catalog)
     end
     fprintf('FMT configured: %s (%s)\n', mdl, settings.Vehicle);
 end
-if ispref('FMT', 'FirmwareRoot'), fmt_firmware_modules('Controller'); end
-if saveChanges
+if ispref('FMT', 'FirmwareRoot')
+    options = fmt_target.options('Controller');
+    modules = fmt_target.modules(options);
+    assert(~isempty(modules), 'FMT:UnsupportedVehicle', ...
+        'BSP %s selects no modules for vehicle %s.', options.board, options.vehicle);
+end
+if settings.Save
     for k = 1:numel(catalog), save_system(catalog(k).name); end
 end
 end

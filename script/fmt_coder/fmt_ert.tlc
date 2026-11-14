@@ -52,7 +52,7 @@
   rtwgensettings.BuildDirSuffix = '_fmt_ert_rtw';
   rtwgensettings.DerivedFrom = 'ert.tlc';
   rtwgensettings.Version = '1';
-  rtwgensettings.SelectCallback = 'fmt_ert_select_callback(hDlg,hSrc)';
+  rtwgensettings.SelectCallback = 'fmt_target.select(hDlg,hSrc)';
 
   rtwoptions = repmat(struct( ...
       'prompt', '', 'type', 'Edit', 'enable', 'on', ...

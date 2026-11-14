@@ -6,13 +6,13 @@ if strcmp(hookMethod, 'entry')
         'FMT:InvalidCodegenSettings', ...
         'Disable GenerateMakefile and GenerateSampleERTMain for native FMT builds.');
     if strcmp(get_param(modelName, 'FMTBuildAction'), 'CodeOnly'), return; end
-    options = fmt_build_options(modelName);
-    catalog = fmt_model_catalog(options.vehicle);
+    options = fmt_target.options(modelName);
+    catalog = fmt_target.catalog(options.vehicle);
     entry = catalog(strcmp(modelName, {catalog.name}));
     assert(~isempty(entry) && strcmpi(get_param(modelName, 'FileName'), entry.source), ...
         'FMT:WrongVehicleModel', ...
         'Model source does not match FMTVehicle. Run fmt_configure_models first.');
-    modules = fmt_firmware_modules(modelName);
+    modules = fmt_target.modules(options);
     assert(any(strcmp(entry.module, modules)), 'FMT:UnselectedModel', ...
         '%s is not selected by this board, vehicle and simulation mode.', modelName);
 end
@@ -24,9 +24,9 @@ if strcmp(action, 'CodeOnly')
     return;
 end
 
-assert(strcmp(action, 'Build'), ...
-    'Upload is not connected yet. Select Build.');
+assert(strcmp(action, 'Build'), 'FMT:InvalidBuildAction', ...
+    'Build action must be CodeOnly or Build.');
 
-fmt_sync_models({modelName}, modelName);
-fmt_build_firmware(modelName);
+fmt_target.sync({modelName}, modelName);
+fmt_target.build(modelName);
 end
