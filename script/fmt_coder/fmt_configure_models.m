@@ -102,7 +102,7 @@ for k = 1:numel(catalog)
         'UtilityFuncGeneration', 'Shared location', 'FMTVehicle', settings.Vehicle);
     if ~isempty(settings.Board), set_param(config, 'FMTBoard', char(settings.Board)); end
     if ~isempty(settings.Airframe)
-        set_param(config, 'FMTAirframe', num2str(settings.Airframe));
+        set_param(config, 'FMTAirframe', settings.Airframe);
     end
     if ~isempty(settings.SimulationMode)
         set_param(config, 'FMTSimMode', char(settings.SimulationMode));
