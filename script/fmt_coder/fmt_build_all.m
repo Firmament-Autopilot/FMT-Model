@@ -34,7 +34,7 @@ setappdata(0, 'FMTCodegenBatch', true);
 releaseBatch = onCleanup(@() rmappdata(0, 'FMTCodegenBatch'));
 for k = 1:numel(selected)
     fprintf('FMT generating: %s\n', selected(k).name);
-    slbuild(selected(k).name, 'GenerateCodeOnly', true);
+    slbuild(selected(k).name);
 end
 clear releaseBatch;
 fmt_target.sync({selected.name}, 'Controller');

@@ -19,7 +19,7 @@ buildpath = fullfile(rootpath, 'build');
 if(~exist(buildpath, 'dir'))
    mkdir(buildpath); 
 end
-codegenpath = fullfile(buildpath, 'fmt', Vehicle);
+codegenpath = fullfile(buildpath, 'fmt', ['R' version('-release')], Vehicle);
 if ~exist(codegenpath, 'dir'), mkdir(codegenpath); end
 set_param(0, 'CodeGenFolder', codegenpath);
 set_param(0, 'CacheFolder', codegenpath);
