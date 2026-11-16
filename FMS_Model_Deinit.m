@@ -5,3 +5,5 @@ warning('off', 'MATLAB:rmpath:DirNotFound');
 rmpath(genpath('build'));
 rmpath(genpath('model'));
 warning('on', 'MATLAB:rmpath:DirNotFound');
+
+clear;
