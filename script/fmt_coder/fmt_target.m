@@ -162,12 +162,12 @@ classdef fmt_target
             fprintf('Firmware output: %s\n', binPath);
         end
 
-        function sync(modelNames, ownerModel)
-            %SYNC - Publish generated modules and shared runtime code together
-            %   fmt_target.sync(modelNames,ownerModel) validates and stages all exports
+        function sync(modelNames, configModel)
+            %SYNC - Replace each selected library with its generated C/H files
+            %   fmt_target.sync(modelNames,configModel) validates and stages all exports
             %   before updating Firmware libraries. Unchanged exports are skipped.
             modelNames = cellstr(string(modelNames));
-            options = fmt_target.options(ownerModel);
+            options = fmt_target.options(configModel);
             modules = fmt_target.modules(options);
             catalog = fmt_target.catalog(options.vehicle);
             selected = catalog(ismember({catalog.module}, modules));
@@ -178,15 +178,9 @@ classdef fmt_target
                 'Select at least one model, without duplicate names.');
             workRoot = fullfile(options.firmwareRoot, 'build', 'model_sync');
             if ~isfolder(workRoot), mkdir(workRoot); end
-            sharedOwner = selected(1);
-            ownerDst = fullfile(options.firmwareRoot, 'src', 'model', sharedOwner.module, 'lib');
             stageRoot = tempname(workRoot);
             mkdir(stageRoot);
             cleanup = onCleanup(@() cleanupStageRoot(stageRoot, workRoot));
-            sharedStage = fullfile(stageRoot, 'shared');
-            mkdir(sharedStage);
-            seedShared(ownerDst, sharedStage);
-            sharedImports = containers.Map('KeyType', 'char', 'ValueType', 'char');
             records = struct('stage', {}, 'destination', {}, 'backup', {}, 'touched', {});
 
             for k = 1:numel(modelNames)
@@ -204,81 +198,19 @@ classdef fmt_target
                 assert(isfolder(destination), 'FMT:MissingModule', ...
                     'Firmware model library not found: %s', destination);
                 validateInterface(entry, src, fileparts(destination), options.airframe);
-                stage = tempname(stageRoot);
-                mkdir(stage);
+                stage = cloneLibrary(destination, stageRoot);
+                previous = sourceFiles(stage);
+                for f = 1:numel(previous)
+                    delete(fullfile(stage, previous(f).name));
+                end
+                marker = fullfile(stage, '_fmt_shared.manifest');
+                if isfile(marker), delete(marker); end
                 files = sourceFiles(src);
                 for f = 1:numel(files)
                     name = files(f).name;
-                    source = fullfile(src, name);
-                    % Fixed-name generated runtime routines must be compiled only once.
-                    if ~isempty(regexp(name, '^rt[A-Z_].*\.[ch]$', 'once'))
-                        importShared(source, name);
-                    else
-                        copyfile(source, fullfile(stage, name));
-                    end
-                end
-                if isfile(fullfile(src, 'rtwtypes.h'))
-                    importShared(fullfile(src, 'rtwtypes.h'), 'rtwtypes.h');
-                end
-                sharedDir = info.SharedUtilsTgtDir;
-                if ~isfolder(sharedDir), sharedDir = fullfile(info.CodeGenFolder, sharedDir); end
-                if isfolder(sharedDir)
-                    files = modelSharedFiles(src, sharedDir);
-                    for f = 1:numel(files)
-                        importShared(fullfile(sharedDir, files(f).name), files(f).name);
-                    end
+                    copyfile(fullfile(src, name), fullfile(stage, name));
                 end
                 records(end + 1) = makeRecord(stage, destination); %#ok<AGROW>
-            end
-
-            % The first selected source module owns the shared runtime. Its existing
-            % SConscript already compiles lib/*.c and publishes lib's include directory.
-            ownerIndex = find(strcmp({records.destination}, ownerDst), 1);
-            if isempty(ownerIndex)
-                ownerStage = cloneLibrary(ownerDst, stageRoot);
-                records(end + 1) = makeRecord(ownerStage, ownerDst);
-                ownerIndex = numel(records);
-            end
-            ownerStage = records(ownerIndex).stage;
-            removeOldShared(ownerDst, ownerStage);
-            commonFiles = sourceFiles(sharedStage);
-            for f = 1:numel(commonFiles)
-                name = commonFiles(f).name;
-                target = fullfile(ownerStage, name);
-                source = fullfile(sharedStage, name);
-                if isfile(target)
-                    assert(strcmp(canonicalSource(target, true), canonicalSource(source, true)), ...
-                        'FMT:SharedOwnerConflict', 'Shared support conflicts with owner file %s.', name);
-                else
-                    copyfile(source, target);
-                end
-            end
-            writeSharedManifest(ownerStage, {commonFiles.name});
-
-            % Only deduplicate support used by this export, not cached files from
-            % other models. All updates are staged before publication.
-            commonSources = keys(sharedImports);
-            commonSources = commonSources(endsWith(commonSources, '.c'));
-            for k = 1:numel(selected)
-                if strcmp(selected(k).name, sharedOwner.name), continue; end
-                otherLib = fullfile(options.firmwareRoot, 'src', 'model', selected(k).module, 'lib');
-                recordIndex = find(strcmp({records.destination}, otherLib), 1);
-                for f = 1:numel(commonSources)
-                    name = commonSources{f};
-                    if isempty(recordIndex), candidate = fullfile(otherLib, name);
-                    else, candidate = fullfile(records(recordIndex).stage, name); end
-                    if ~isfile(candidate), continue; end
-                    assert(strcmp(canonicalSource(candidate, true), ...
-                        canonicalSource(fullfile(sharedStage, name), true)), ...
-                        'FMT:SharedMigrationRequired', ...
-                        'Runtime file %s differs. Run fmt_build_all to regenerate the selected models.', name);
-                    if isempty(recordIndex)
-                        stage = cloneLibrary(otherLib, stageRoot);
-                        records(end + 1) = makeRecord(stage, otherLib); %#ok<AGROW>
-                        recordIndex = numel(records);
-                    end
-                    delete(fullfile(records(recordIndex).stage, name));
-                end
             end
 
             try
@@ -316,17 +248,6 @@ classdef fmt_target
             end
             clear cleanup;
 
-                function importShared(source, name)
-                    body = canonicalSource(source, true);
-                    if isKey(sharedImports, name)
-                        assert(strcmp(sharedImports(name), body), 'FMT:SharedCodeConflict', ...
-                            'Conflicting shared file %s. Use consistent code generation settings.', name);
-                    end
-                    % Replace previous support files with this generation's versions.
-                    sharedImports(name) = body;
-                    copyfile(source, fullfile(sharedStage, name), 'f');
-                end
-
         end
     end
 end
@@ -347,90 +268,6 @@ function files = sourceFiles(folder)
 files = [dir(fullfile(folder, '*.c')); dir(fullfile(folder, '*.h'))];
 end
 
-function files = modelSharedFiles(source, sharedDir)
-files = sourceFiles(sharedDir);
-names = {files.name};
-needed = false(size(files));
-modelFiles = sourceFiles(source);
-pending = cellfun(@(name) fullfile(source, name), {modelFiles.name}, ...
-    'UniformOutput', false);
-references = {};
-infoFile = fullfile(source, 'buildInfo.mat');
-if isfile(infoFile)
-    data = load(infoFile, 'buildInfo');
-    sources = data.buildInfo.getSourceFiles(false, false);
-    headers = data.buildInfo.getIncludeFiles(false, false);
-    references = [sources(:); headers(:)];
-end
-index = 1;
-while index <= numel(pending)
-    body = fileread(pending{index});
-    tokens = regexp(body, '(?m)^\s*#\s*include\s*["<]([^">]+)[">]', 'tokens');
-    references = [references; cellfun(@(token) token{1}, tokens(:), ...
-        'UniformOutput', false)]; %#ok<AGROW>
-    % Pooled constants have no companion header; model headers declare them.
-    if contains(body, 'rtCP_pooled_')
-        references{end + 1} = 'const_params.c'; %#ok<AGROW>
-    end
-    for k = 1:numel(references)
-        [~, stem, extension] = fileparts(references{k});
-        candidates = {[stem extension], [stem '.c'], [stem '.h']};
-        for n = 1:numel(candidates)
-            if isfile(fullfile(source, candidates{n})), continue; end
-            match = find(strcmp(names, candidates{n}), 1);
-            if ~isempty(match) && ~needed(match)
-                needed(match) = true;
-                pending{end + 1} = fullfile(sharedDir, names{match}); %#ok<AGROW>
-            end
-        end
-    end
-    references = {};
-    index = index + 1;
-end
-files = files(needed);
-end
-
-function seedShared(owner, destination)
-names = sharedManifest(owner);
-if isempty(names)
-    files = sourceFiles(owner);
-    names = {files.name};
-    names = names(~cellfun('isempty', regexp(names, '^rt[A-Z_].*\.[ch]$')));
-    if isfile(fullfile(owner, 'rtwtypes.h')), names{end + 1} = 'rtwtypes.h'; end
-end
-for k = 1:numel(names)
-    assert(isfile(fullfile(owner, names{k})), 'FMT:MissingSharedFile', ...
-        'A shared export file is missing: %s', names{k});
-    copyfile(fullfile(owner, names{k}), fullfile(destination, names{k}));
-end
-end
-
-function names = sharedManifest(folder)
-file = fullfile(folder, '_fmt_shared.manifest');
-if ~isfile(file), names = {}; return; end
-names = cellstr(splitlines(strtrim(string(fileread(file)))));
-names = names(~cellfun('isempty', names));
-for k = 1:numel(names)
-    assert(~isempty(regexp(names{k}, '^[A-Za-z0-9_]+\.[ch]$', 'once')), ...
-        'FMT:InvalidSharedManifest', 'Invalid shared export file name.');
-end
-end
-
-function removeOldShared(previous, stage)
-names = sharedManifest(previous);
-for k = 1:numel(names)
-    file = fullfile(stage, names{k});
-    if isfile(file) && ~strcmp(names{k}, 'rtwtypes.h'), delete(file); end
-end
-end
-
-function writeSharedManifest(folder, names)
-fid = fopen(fullfile(folder, '_fmt_shared.manifest'), 'wt');
-assert(fid ~= -1, 'FMT:ManifestWrite', 'Cannot write the shared export marker.');
-release = onCleanup(@() fclose(fid));
-fprintf(fid, '%s\n', names{:});
-end
-
 function stage = cloneLibrary(source, workRoot)
 stage = tempname(workRoot);
 mkdir(stage);
@@ -443,15 +280,11 @@ for k = 1:numel(files)
 end
 end
 
-function text = canonicalSource(file, removeBanner)
+function text = canonicalSource(file)
 text = strrep(fileread(file), sprintf('\r\n'), newline);
-if removeBanner
-    text = regexprep(text, '^/\*[\s\S]*?\*/\s*', '');
-else
-    % A timestamp or model revision banner alone does not require a backup.
-    text = regexprep(text, ['(?m)^\s*\* (Model version\s*:|' ...
-        'C/C\+\+ source code generated on\s*:)[^\n]*\n'], '');
-end
+% A timestamp or model revision banner alone does not require a backup.
+text = regexprep(text, ['(?m)^\s*\* (Model version\s*:|' ...
+    'C/C\+\+ source code generated on\s*:)[^\n]*\n'], '');
 end
 
 function result = sameFolder(first, second)
@@ -462,8 +295,8 @@ b = dir(second); b = b(~[b.isdir]);
 result = isequal(aNames, bNames);
 if ~result, return; end
 for k = 1:numel(aNames)
-    result = strcmp(canonicalSource(fullfile(first, a(orderA(k)).name), false), ...
-        canonicalSource(fullfile(second, b(orderB(k)).name), false));
+    result = strcmp(canonicalSource(fullfile(first, a(orderA(k)).name)), ...
+        canonicalSource(fullfile(second, b(orderB(k)).name)));
     if ~result, return; end
 end
 end
