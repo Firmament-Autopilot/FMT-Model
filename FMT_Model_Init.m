@@ -68,3 +68,4 @@ run('fms_init.m');
 
 sl_refresh_customizations;
 setappdata(0, 'FMTInitializedVehicle', Vehicle);
+fmt_configure_models('Save', false);

@@ -73,7 +73,7 @@
   rtwoptions(3).type       = 'Popup';
   rtwoptions(3).popupstrings = 'Multicopter|Fixwing|VTOL|Car|Boat';
   rtwoptions(3).tlcvariable = 'FMTVehicle';
-  rtwoptions(3).tooltip     = 'Load the matching source models with fmt_configure_models when changing vehicle';
+  rtwoptions(3).tooltip     = 'Vehicle is initialized by FMT_Model_Init.m; reopen the project after changing it';
 
   rtwoptions(4).prompt      = 'Airframe';
   rtwoptions(4).default     = '1';

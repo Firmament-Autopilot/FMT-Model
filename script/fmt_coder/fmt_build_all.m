@@ -1,6 +1,6 @@
 function binPath = fmt_build_all(varargin)
 %fmt_build_all - Generate all selected models and compile firmware once
-%   binPath = fmt_build_all builds the target configured on Controller.
+%   binPath = fmt_build_all builds the vehicle selected in the base workspace.
 %
 %   binPath = fmt_build_all(...,Board=BOARD,Vehicle=VEHICLE,Airframe=AIRFRAME)
 %   applies target settings in memory and builds the selected models.
@@ -10,12 +10,6 @@ assert(~isappdata(0, 'FMTCodegenBatch'), 'FMT:RecursiveBuild', ...
     'Another FMT batch build is already active.');
 assert(isempty(varargin) || ~any(strcmpi(string(varargin(1:2:end)), 'Save')), ...
     'FMT:InvalidBuildOption', 'Save is an option of fmt_configure_models only.');
-if isempty(varargin) && bdIsLoaded('Controller') && ...
-        strcmp(get_param('Controller', 'SystemTargetFile'), 'fmt_ert.tlc')
-    previous = fmt_target.options('Controller');
-    varargin = {'Board', previous.board, 'Vehicle', previous.vehicle, ...
-        'Airframe', previous.airframe, 'SimulationMode', previous.sim};
-end
 fmt_configure_models('Save', false, varargin{:});
 options = fmt_target.options('Controller');
 modules = fmt_target.modules(options);
