@@ -7,6 +7,8 @@ function fmt_configure_models(varargin)
 %
 %   fmt_configure_models(...,Save=false) applies settings without saving.
 %
+%   Firmware availability is checked by Sync and Build, not configuration.
+%
 %   See also fmt_build_all, slbuild
 assert(evalin('base', 'exist(''Vehicle'', ''var'')') == 1, ...
     'FMT:MissingVehicle', 'Open FMT_Model.prj before configuring models.');
@@ -87,12 +89,6 @@ for k = 1:numel(catalog)
         settings.SimulationMode = get_param(config, 'FMTSimMode');
     end
     fprintf('FMT configured: %s (%s)\n', mdl, settings.Vehicle);
-end
-if ispref('FMT', 'FirmwareRoot')
-    options = fmt_target.options('Controller');
-    modules = fmt_target.modules(options);
-    assert(~isempty(modules), 'FMT:UnsupportedVehicle', ...
-        'BSP %s selects no modules for vehicle %s.', options.board, options.vehicle);
 end
 if settings.Save
     for k = 1:numel(catalog), save_system(catalog(k).name); end
