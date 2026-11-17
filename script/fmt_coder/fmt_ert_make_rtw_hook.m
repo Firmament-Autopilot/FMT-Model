@@ -24,9 +24,11 @@ if strcmp(action, 'CodeOnly')
     return;
 end
 
-assert(strcmp(action, 'Build'), 'FMT:InvalidBuildAction', ...
-    'Build action must be CodeOnly or Build.');
+assert(any(strcmp(action, {'Sync', 'Build'})), 'FMT:InvalidBuildAction', ...
+    'Build action must be CodeOnly, Sync, or Build.');
 
 fmt_target.sync({modelName}, modelName);
-fmt_target.build(modelName);
+if strcmp(action, 'Build')
+    fmt_target.build(modelName);
+end
 end

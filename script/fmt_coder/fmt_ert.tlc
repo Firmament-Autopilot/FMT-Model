@@ -89,8 +89,9 @@
   rtwoptions(6).prompt       = 'Build action';
   rtwoptions(6).type         = 'Popup';
   rtwoptions(6).default      = 'Build';
-  rtwoptions(6).popupstrings = 'CodeOnly|Build';
+  rtwoptions(6).popupstrings = 'CodeOnly|Sync|Build';
   rtwoptions(6).tlcvariable  = 'FMTBuildAction';
+  rtwoptions(6).tooltip      = 'CodeOnly: generate C; Sync: generate and synchronize; Build: also compile firmware';
 
   END_RTW_OPTIONS
 %/
