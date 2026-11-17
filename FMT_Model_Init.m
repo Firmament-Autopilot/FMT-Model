@@ -2,9 +2,7 @@
 %% brief: run this script to init FMT Model
 
 % Select vehicle type: Multicopter | Fixwing | VTOL | Car | Boat
-if ~exist('Vehicle', 'var')
-    Vehicle = 'Multicopter';
-end
+Vehicle = 'VTOL';
 
 start_time = 0;
 end_time = 1000;
