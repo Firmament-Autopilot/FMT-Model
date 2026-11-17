@@ -173,7 +173,6 @@ classdef fmt_target
             selected = catalog(ismember({catalog.module}, modules));
             assert(all(ismember(modelNames, {selected.name})), 'FMT:UnselectedModel', ...
                 'A requested model is not selected by the MATLAB BSP rules.');
-            completeSet = all(ismember({selected.name}, modelNames));
             assert(~isempty(selected) && ~isempty(modelNames) && ...
                 numel(unique(modelNames)) == numel(modelNames), 'FMT:InvalidModelSet', ...
                 'Select at least one model, without duplicate names.');
@@ -321,11 +320,8 @@ classdef fmt_target
                     if isKey(sharedImports, name)
                         assert(strcmp(sharedImports(name), body), 'FMT:SharedCodeConflict', ...
                             'Conflicting shared file %s. Use consistent code generation settings.', name);
-                    elseif isfile(fullfile(sharedStage, name)) && ~completeSet
-                        assert(strcmp(canonicalSource(fullfile(sharedStage, name), true), body), ...
-                            'FMT:SharedRebuildRequired', ...
-                            'Shared file %s changed. Run fmt_build_all to rebuild all selected models.', name);
                     end
+                    % Replace previous support files with this generation's versions.
                     sharedImports(name) = body;
                     copyfile(source, fullfile(sharedStage, name), 'f');
                 end
