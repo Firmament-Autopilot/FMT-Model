@@ -4,6 +4,7 @@ classdef fmt_target
     %   build commands and the native Coder hook.
     %
     %   fmt_target functions:
+    %       vehicle - Read the initialized workspace vehicle
     %       catalog - Locate vehicle source models
     %       firmwareRoot - Read or update the local Firmware folder
     %       configureFirmwareRoot - Open the local Firmware folder settings
@@ -16,6 +17,18 @@ classdef fmt_target
     %   See also fmt_configure_models, fmt_build_all
 
     methods (Static)
+        function vehicle = vehicle
+            %VEHICLE - Use the vehicle selected during project initialization
+            assert(evalin('base', 'exist(''Vehicle'', ''var'')') == 1, ...
+                'FMT:MissingVehicle', 'Open FMT_Model.prj before configuring or building models.');
+            vehicle = char(evalin('base', 'Vehicle'));
+            assert(evalin('base', 'exist(''control_config'', ''var'')') == 1 && ...
+                isappdata(0, 'FMTInitializedVehicle') && ...
+                strcmp(getappdata(0, 'FMTInitializedVehicle'), vehicle), ...
+                'FMT:ProjectNotInitialized', ...
+                'Change Vehicle in FMT_Model_Init.m and reopen the project before configuring or building models.');
+        end
+
         function catalog = catalog(vehicle)
             %CATALOG - Map existing vehicle models to Firmware modules
             %   CATALOG = fmt_target.catalog(VEHICLE) locates the source models.
@@ -134,7 +147,7 @@ classdef fmt_target
             options.firmwareRoot = fmt_target.firmwareRoot;
             options.board = char(get_param(modelName, 'FMTBoard'));
             options.board = strrep(options.board, '\', '/');
-            options.vehicle = char(get_param(modelName, 'FMTVehicle'));
+            options.vehicle = fmt_target.vehicle;
             options.airframe = str2double(string(get_param(modelName, 'FMTAirframe')));
             options.sim = char(get_param(modelName, 'FMTSimMode'));
             assert(~isempty(regexp(options.board, '^[A-Za-z0-9_+-]+(/[A-Za-z0-9_+-]+)*$', 'once')), ...

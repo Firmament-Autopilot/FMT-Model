@@ -2,37 +2,26 @@ function fmt_configure_models(varargin)
 %fmt_configure_models - Configure existing models for native Coder builds
 %   fmt_configure_models configures and saves the current vehicle models.
 %
-%   fmt_configure_models(...,Vehicle=VEHICLE,Board=BOARD,Airframe=AIRFRAME)
-%   selects existing source models and applies the requested target.
+%   fmt_configure_models(...,Board=BOARD,Airframe=AIRFRAME) applies the
+%   requested target to the vehicle initialized in the base workspace.
 %
 %   fmt_configure_models(...,Save=false) applies settings without saving.
 %
 %   Firmware availability is checked by Sync and Build, not configuration.
 %
 %   See also fmt_build_all, slbuild
-assert(evalin('base', 'exist(''Vehicle'', ''var'')') == 1, ...
-    'FMT:MissingVehicle', 'Open FMT_Model.prj before configuring models.');
-vehicle = char(evalin('base', 'Vehicle'));
+vehicle = fmt_target.vehicle;
 p = inputParser;
 p.PartialMatching = false;
 p.addParameter('Save', true, @(x) islogical(x) && isscalar(x));
 p.addParameter('FirmwareRoot', '');
 p.addParameter('Board', '');
-p.addParameter('Vehicle', vehicle);
 p.addParameter('Airframe', [], @(x) isempty(x) || ...
     (isnumeric(x) && isscalar(x) && isfinite(x) && x >= 1 && x == fix(x)));
 p.addParameter('SimulationMode', '');
 p.parse(varargin{:});
 settings = p.Results;
-settings.Vehicle = char(settings.Vehicle);
-catalog = fmt_target.catalog(settings.Vehicle);
-
-assert(evalin('base', 'exist(''control_config'', ''var'')') == 1 && ...
-    strcmp(vehicle, settings.Vehicle) && ...
-    isappdata(0, 'FMTInitializedVehicle') && ...
-    strcmp(getappdata(0, 'FMTInitializedVehicle'), vehicle), ...
-    'FMT:ProjectNotInitialized', ...
-    'Change Vehicle in FMT_Model_Init.m and reopen the project before configuring models.');
+catalog = fmt_target.catalog(vehicle);
 for k = 1:numel(catalog)
     mdl = catalog(k).name;
     assert(~bdIsLoaded(mdl) || strcmpi(get_param(mdl, 'FileName'), catalog(k).source), ...
@@ -44,8 +33,8 @@ if ~isempty(settings.FirmwareRoot)
     fmt_target.firmwareRoot(settings.FirmwareRoot);
 end
 Simulink.fileGenControl('set', 'CodeGenFolder', ...
-    fullfile(rootDir, 'build', 'fmt', settings.Vehicle), ...
-    'CacheFolder', fullfile(rootDir, 'build', 'fmt', settings.Vehicle), ...
+    fullfile(rootDir, 'build', 'fmt', vehicle), ...
+    'CacheFolder', fullfile(rootDir, 'build', 'fmt', vehicle), ...
     'CodeGenFolderStructure', Simulink.filegen.CodeGenFolderStructure.ModelSpecific, ...
     'createDir', true);
 
@@ -75,7 +64,7 @@ for k = 1:numel(catalog)
         'GenerateSampleERTMain', 'off', 'TargetLang', 'C', ...
         'ProdIntDivRoundTo', 'Zero', 'TargetIntDivRoundTo', 'Zero', ...
         'CodeReplacementLibrary', 'STM32 DSP LIB', ...
-        'UtilityFuncGeneration', 'Auto', 'FMTVehicle', settings.Vehicle);
+        'UtilityFuncGeneration', 'Auto');
     if ~isempty(settings.Board), set_param(config, 'FMTBoard', char(settings.Board)); end
     if ~isempty(settings.Airframe)
         set_param(config, 'FMTAirframe', settings.Airframe);
@@ -88,7 +77,7 @@ for k = 1:numel(catalog)
         settings.Airframe = str2double(string(get_param(config, 'FMTAirframe')));
         settings.SimulationMode = get_param(config, 'FMTSimMode');
     end
-    fprintf('FMT configured: %s (%s)\n', mdl, settings.Vehicle);
+    fprintf('FMT configured: %s (%s)\n', mdl, vehicle);
 end
 if settings.Save
     for k = 1:numel(catalog), save_system(catalog(k).name); end
