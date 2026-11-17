@@ -57,11 +57,11 @@
   rtwoptions = repmat(struct( ...
       'prompt', '', 'type', 'Edit', 'enable', 'on', ...
       'default', '', 'popupstrings', '', 'tlcvariable', '', ...
-      'tooltip', '', 'callback', '', 'makevariable', ''), 1, 6);
+      'tooltip', '', 'callback', '', 'makevariable', ''), 1, 7);
 
   rtwoptions(1).prompt  = 'FMT Firmware';
   rtwoptions(1).type    = 'Category';
-  rtwoptions(1).default = 5;
+  rtwoptions(1).default = 6;
 
   rtwoptions(2).prompt      = 'Board';
   rtwoptions(2).default     = 'sieon/s1';
@@ -92,6 +92,12 @@
   rtwoptions(6).popupstrings = 'CodeOnly|Sync|Build';
   rtwoptions(6).tlcvariable  = 'FMTBuildAction';
   rtwoptions(6).tooltip      = 'CodeOnly: generate C; Sync: generate and synchronize; Build: also compile firmware';
+
+  rtwoptions(7).prompt       = 'Firmware root...';
+  rtwoptions(7).type         = 'Pushbutton';
+  rtwoptions(7).tlcvariable  = 'FMTFirmwareRootSettings';
+  rtwoptions(7).callback     = 'fmt_target.configureFirmwareRoot;';
+  rtwoptions(7).tooltip      = 'View or change the Firmware folder saved in local MATLAB preferences';
 
   END_RTW_OPTIONS
 %/

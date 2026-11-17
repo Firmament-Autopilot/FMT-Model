@@ -5,6 +5,8 @@ classdef fmt_target
     %
     %   fmt_target functions:
     %       catalog - Locate vehicle source models
+    %       firmwareRoot - Read or update the local Firmware folder
+    %       configureFirmwareRoot - Open the local Firmware folder settings
     %       options - Validate applied build settings
     %       modules - Select BSP modules in MATLAB
     %       select  - Apply Coder target defaults
@@ -43,15 +45,77 @@ classdef fmt_target
             end
         end
 
+        function root = firmwareRoot(root)
+            %FIRMWAREROOT - Read or save the machine-local Firmware folder
+            if nargin == 0
+                assert(ispref('FMT', 'FirmwareRoot'), 'FMT:MissingFirmwareRoot', ...
+                    'Choose Firmware root... under Code Generation > FMT Firmware.');
+                root = getpref('FMT', 'FirmwareRoot');
+            end
+            root = strtrim(char(root));
+            assert(isrow(root) && ~isempty(root) && ...
+                isempty(regexp(root, '["%!\r\n]', 'once')), ...
+                'FMT:InvalidFirmwareRoot', 'Choose an existing, shell-safe Firmware folder.');
+            assert(isfolder(root) && isfolder(fullfile(root, 'src')) && ...
+                isfolder(fullfile(root, 'target')), 'FMT:InvalidFirmwareRoot', ...
+                'Select the FMT-Firmware root containing the src and target folders.');
+            root = char(java.io.File(root).getCanonicalPath());
+            if nargin > 0, setpref('FMT', 'FirmwareRoot', root); end
+        end
+
+        function window = configureFirmwareRoot
+            %CONFIGUREFIRMWAREROOT - Edit local preferences without model data
+            window = findall(0, 'Type', 'figure', 'Tag', 'FMTFirmwareRootDialog');
+            if ~isempty(window), figure(window(1)); window = window(1); return; end
+            window = dialog('Name', 'FMT Firmware Root', ...
+                'Tag', 'FMTFirmwareRootDialog', 'WindowStyle', 'normal', ...
+                'Position', [100 100 720 190], 'Visible', 'off');
+            uicontrol(window, 'Style', 'text', 'String', 'Firmware root:', ...
+                'HorizontalAlignment', 'left', 'Position', [20 155 680 20]);
+            pathBox = uicontrol(window, 'Style', 'edit', ...
+                'Tag', 'FMTFirmwareRootPath', ...
+                'String', char(getpref('FMT', 'FirmwareRoot', '')), ...
+                'HorizontalAlignment', 'left', 'BackgroundColor', 'white', ...
+                'Position', [20 122 575 28]);
+            uicontrol(window, 'Style', 'pushbutton', 'String', 'Browse...', ...
+                'Tag', 'FMTFirmwareRootBrowse', 'Position', [605 122 95 28], ...
+                'Callback', @browse);
+            status = uicontrol(window, 'Style', 'text', ...
+                'Tag', 'FMTFirmwareRootStatus', 'HorizontalAlignment', 'left', ...
+                'String', 'Saved in local MATLAB preferences for all FMT models.', ...
+                'Position', [20 64 680 43]);
+            uicontrol(window, 'Style', 'pushbutton', 'String', 'Save', ...
+                'Tag', 'FMTFirmwareRootSave', 'Position', [500 20 95 28], ...
+                'Callback', @saveRoot);
+            uicontrol(window, 'Style', 'pushbutton', 'String', 'Cancel', ...
+                'Tag', 'FMTFirmwareRootCancel', 'Position', [605 20 95 28], ...
+                'Callback', @(~, ~) delete(window));
+            movegui(window, 'center');
+            set(window, 'Visible', 'on');
+
+            function browse(~, ~)
+                start = get(pathBox, 'String');
+                if ~isfolder(start), start = pwd; end
+                chosen = uigetdir(start, 'Select the FMT-Firmware root');
+                if ~isequal(chosen, 0), set(pathBox, 'String', chosen); end
+            end
+
+            function saveRoot(~, ~)
+                try
+                    root = fmt_target.firmwareRoot(get(pathBox, 'String'));
+                catch err
+                    set(status, 'String', err.message, 'ForegroundColor', [0.75 0.1 0.1]);
+                    return;
+                end
+                fprintf('FMT Firmware root: %s\n', root);
+                delete(window);
+            end
+        end
+
         function options = options(modelName)
             %OPTIONS - Read and validate the applied FMT configuration
             %   OPTIONS = fmt_target.options(modelName) reads target and local paths.
-            assert(ispref('FMT', 'FirmwareRoot'), 'FMT:MissingFirmwareRoot', ...
-                'Set the FMT/FirmwareRoot MATLAB preference before building.');
-            root = char(getpref('FMT', 'FirmwareRoot'));
-            assert(isfolder(root) && isempty(regexp(root, '["%!\r\n]', 'once')), ...
-                'FMT:InvalidFirmwareRoot', 'FirmwareRoot must be an existing, shell-safe directory.');
-            options.firmwareRoot = char(java.io.File(root).getCanonicalPath());
+            options.firmwareRoot = fmt_target.firmwareRoot;
             options.board = char(get_param(modelName, 'FMTBoard'));
             options.board = strrep(options.board, '\', '/');
             options.vehicle = char(get_param(modelName, 'FMTVehicle'));

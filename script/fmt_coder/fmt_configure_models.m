@@ -39,9 +39,7 @@ for k = 1:numel(catalog)
 end
 rootDir = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 if ~isempty(settings.FirmwareRoot)
-    assert(isfolder(settings.FirmwareRoot), 'FMT:MissingFirmwareRoot', ...
-        'FirmwareRoot does not exist.');
-    setpref('FMT', 'FirmwareRoot', char(settings.FirmwareRoot));
+    fmt_target.firmwareRoot(settings.FirmwareRoot);
 end
 Simulink.fileGenControl('set', 'CodeGenFolder', ...
     fullfile(rootDir, 'build', 'fmt', settings.Vehicle), ...
