@@ -135,7 +135,7 @@ classdef fmt_target
             slConfigUISetVal(hDlg, hSrc, 'GenerateMakefile', 'off');
             slConfigUISetVal(hDlg, hSrc, 'GenerateSampleERTMain', 'off');
             slConfigUISetVal(hDlg, hSrc, 'CodeReplacementLibrary', 'STM32 DSP LIB');
-            slConfigUISetVal(hDlg, hSrc, 'UtilityFuncGeneration', 'Shared location');
+            slConfigUISetVal(hDlg, hSrc, 'UtilityFuncGeneration', 'Auto');
             slConfigUISetVal(hDlg, hSrc, 'ProdIntDivRoundTo', 'Zero');
             slConfigUISetVal(hDlg, hSrc, 'TargetIntDivRoundTo', 'Zero');
         end
@@ -223,7 +223,7 @@ classdef fmt_target
                 sharedDir = info.SharedUtilsTgtDir;
                 if ~isfolder(sharedDir), sharedDir = fullfile(info.CodeGenFolder, sharedDir); end
                 if isfolder(sharedDir)
-                    files = sourceFiles(sharedDir);
+                    files = modelSharedFiles(src, sharedDir);
                     for f = 1:numel(files)
                         importShared(fullfile(sharedDir, files(f).name), files(f).name);
                     end
@@ -255,15 +255,16 @@ classdef fmt_target
             end
             writeSharedManifest(ownerStage, {commonFiles.name});
 
-            % Remove duplicate support sources from other selected libraries only when
-            % their implementations match. All updates are staged before publication.
-            commonSources = dir(fullfile(sharedStage, '*.c'));
+            % Only deduplicate support used by this export, not cached files from
+            % other models. All updates are staged before publication.
+            commonSources = keys(sharedImports);
+            commonSources = commonSources(endsWith(commonSources, '.c'));
             for k = 1:numel(selected)
                 if strcmp(selected(k).name, sharedOwner.name), continue; end
                 otherLib = fullfile(options.firmwareRoot, 'src', 'model', selected(k).module, 'lib');
                 recordIndex = find(strcmp({records.destination}, otherLib), 1);
                 for f = 1:numel(commonSources)
-                    name = commonSources(f).name;
+                    name = commonSources{f};
                     if isempty(recordIndex), candidate = fullfile(otherLib, name);
                     else, candidate = fullfile(records(recordIndex).stage, name); end
                     if ~isfile(candidate), continue; end
@@ -346,6 +347,49 @@ function files = sourceFiles(folder)
 files = [dir(fullfile(folder, '*.c')); dir(fullfile(folder, '*.h'))];
 end
 
+function files = modelSharedFiles(source, sharedDir)
+files = sourceFiles(sharedDir);
+names = {files.name};
+needed = false(size(files));
+modelFiles = sourceFiles(source);
+pending = cellfun(@(name) fullfile(source, name), {modelFiles.name}, ...
+    'UniformOutput', false);
+references = {};
+infoFile = fullfile(source, 'buildInfo.mat');
+if isfile(infoFile)
+    data = load(infoFile, 'buildInfo');
+    sources = data.buildInfo.getSourceFiles(false, false);
+    headers = data.buildInfo.getIncludeFiles(false, false);
+    references = [sources(:); headers(:)];
+end
+index = 1;
+while index <= numel(pending)
+    body = fileread(pending{index});
+    tokens = regexp(body, '(?m)^\s*#\s*include\s*["<]([^">]+)[">]', 'tokens');
+    references = [references; cellfun(@(token) token{1}, tokens(:), ...
+        'UniformOutput', false)]; %#ok<AGROW>
+    % Pooled constants have no companion header; model headers declare them.
+    if contains(body, 'rtCP_pooled_')
+        references{end + 1} = 'const_params.c'; %#ok<AGROW>
+    end
+    for k = 1:numel(references)
+        [~, stem, extension] = fileparts(references{k});
+        candidates = {[stem extension], [stem '.c'], [stem '.h']};
+        for n = 1:numel(candidates)
+            if isfile(fullfile(source, candidates{n})), continue; end
+            match = find(strcmp(names, candidates{n}), 1);
+            if ~isempty(match) && ~needed(match)
+                needed(match) = true;
+                pending{end + 1} = fullfile(sharedDir, names{match}); %#ok<AGROW>
+            end
+        end
+    end
+    references = {};
+    index = index + 1;
+end
+files = files(needed);
+end
+
 function seedShared(owner, destination)
 names = sharedManifest(owner);
 if isempty(names)
@@ -402,7 +446,7 @@ end
 function text = canonicalSource(file, removeBanner)
 text = strrep(fileread(file), sprintf('\r\n'), newline);
 if removeBanner
-    text = regexprep(text, '\A/\*[\s\S]*?\*/\s*', '');
+    text = regexprep(text, '^/\*[\s\S]*?\*/\s*', '');
 else
     % A timestamp or model revision banner alone does not require a backup.
     text = regexprep(text, ['(?m)^\s*\* (Model version\s*:|' ...
