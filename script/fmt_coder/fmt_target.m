@@ -228,6 +228,7 @@ classdef fmt_target
             slConfigUISetVal(hDlg, hSrc, 'GenerateMakefile', 'off');
             slConfigUISetVal(hDlg, hSrc, 'GenerateSampleERTMain', 'off');
             slConfigUISetVal(hDlg, hSrc, 'CodeReplacementLibrary', 'STM32 DSP LIB');
+            slConfigUISetVal(hDlg, hSrc, 'SupportNonFinite', 'off');
             slConfigUISetVal(hDlg, hSrc, 'UtilityFuncGeneration', 'Auto');
             slConfigUISetVal(hDlg, hSrc, 'ProdIntDivRoundTo', 'Zero');
             slConfigUISetVal(hDlg, hSrc, 'TargetIntDivRoundTo', 'Zero');
