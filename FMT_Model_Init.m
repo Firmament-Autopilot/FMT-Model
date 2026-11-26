@@ -17,11 +17,13 @@ buildpath = fullfile(rootpath, 'build');
 if(~exist(buildpath, 'dir'))
    mkdir(buildpath); 
 end
-set_param(0, 'CodeGenFolder', buildpath);
-set_param(0, 'CacheFolder', buildpath);
+codegenpath = fullfile(buildpath, 'fmt', Vehicle);
+if ~exist(codegenpath, 'dir'), mkdir(codegenpath); end
+set_param(0, 'CodeGenFolder', codegenpath);
+set_param(0, 'CacheFolder', codegenpath);
 
 %% add path
-addpath(genpath('build'));
+addpath(fullfile(rootpath, 'script', 'fmt_coder'));
 
 if strcmp(Vehicle, 'Multicopter')
     addpath(genpath('model/Controller/MC-Controller'));
@@ -65,3 +67,5 @@ run('control_init.m');
 run('fms_init.m');
 
 sl_refresh_customizations;
+setappdata(0, 'FMTInitializedVehicle', Vehicle);
+fmt_configure_models('Save', false);
