@@ -36,6 +36,12 @@ git clone https://github.com/Firmament-Autopilot/FMT-Model.git --recursive
 
 Then open MATLAB and change the work directory to FMT-Model root folder. After that, run the`FMT_Model.prj`, which will do all the initialization for you.
 
+### Generate model code and build firmware
+
+After opening `FMT_Model.prj`, run `FMT_Model_CodeGen` in the MATLAB Command Window to open the model code generation UI. The UI detects the model files currently resolved by the MATLAB path and lets you select which models to build. `VEHICLE` and `AIRFRAME` are read directly from the MATLAB base workspace and displayed read-only in the UI.
+
+Optionally configure the FMT-Firmware checkout to copy generated C/C++ files into the matching `src/model/.../lib` directory. Enable the SCons option to build from a target directory containing `SConstruct`. The command uses the read-only vehicle and airframe values, the editable `SIM_Mode` (default `None`), and the configured parallel job count (default 16), for example `scons -j16 --vehicle=Multicopter --airframe=1 --sim=SIH`.
+
 ## Code Catalogue
 FMT-Model source code catalog is shown as follow:
 
