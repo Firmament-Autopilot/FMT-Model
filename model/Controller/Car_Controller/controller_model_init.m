@@ -1,9 +1,6 @@
 model_version = 'v0.0.1';
 model_name = 'Car Controller';
 
-%% load configuration
-load('control_default_config.mat');
-
 %% Constant Variable
 CONTROL_CONST.dt = 0.01;   % model execution period
 

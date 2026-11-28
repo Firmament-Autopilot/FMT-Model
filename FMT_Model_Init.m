@@ -2,7 +2,7 @@
 %% brief: run this script to init FMT Model
 
 % Vehicle type: Multicopter | Fixwing | VTOL | Car | Boat
-VEHICLE = 'Multicopter';
+VEHICLE = 'VTOL';
 % Airframe id
 AIRFRAME = 1;
 

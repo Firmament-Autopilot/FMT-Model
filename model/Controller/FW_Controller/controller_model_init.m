@@ -1,9 +1,6 @@
 model_version = 'v1.0.0';
 model_name = 'FW Controller';
 
-%% load configuration
-load('control_default_config.mat');
-
 %% Constant Variable
 CONTROL_CONST.dt = 0.002;   % model execution period
 

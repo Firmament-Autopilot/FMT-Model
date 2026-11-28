@@ -4,9 +4,6 @@
 model_version = 'v1.0.0';
 model_name = 'Multicopter';
 
-%% load configuration
-load('plant_default_config.mat');
-
 %% Constant Variable (for internal use)
 PLANT_CONST.dt = 0.002;
 

@@ -1,10 +1,6 @@
 model_version = 'v0.0.1';
 model_name = 'VTOL FMS';
 
-%% load model configuration
-% load('fms_default_config_arover.mat');
-load('fms_default_config.mat');
-
 %% Constant Variable
 FMS_CONST.dt = 0.004;
 

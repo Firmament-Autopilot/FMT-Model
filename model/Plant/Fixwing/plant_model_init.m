@@ -5,7 +5,6 @@ model_version = 'v1.0.0';
 model_name = 'Fixwing';
 
 %% load configuration
-load('plant_default_config.mat');
 load('aero_data.mat');
 % load('ap_ini.mat');
 

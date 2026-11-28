@@ -2,7 +2,6 @@ model_version = 'v1.0.0';
 model_name = 'CF INS';
 
 %% Load configuration
-load('ins_default_config');
 wmm = load('wmmgrid_2021.mat');
 
 %% Constant Variable (for internal use)
